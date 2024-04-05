@@ -50,7 +50,7 @@
 </script>
 
 <div class="titleSection">
-	<div class="navbar z-10 fixed ">
+	<div class="navbar z-10 fixed bg-[#ffffff8f]">
 		<div class="flex-1">
 			<a class="btn btn-ghost text-xl" href="/">
 				<div class="flex items-center">

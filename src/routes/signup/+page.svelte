@@ -1,5 +1,6 @@
 <script lang="ts">
 	import genie from '$lib/images/genie.png';
+
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { PageData } from './$types';
 	import { z } from 'zod';
@@ -7,11 +8,16 @@
 	export let data: PageData;
 
 	const userSchema = z.object({
+		name: z
+			.string({ required_error: 'Name is required' })
+			.min(3, { message: 'At least 3 characters' })
+			.max(256, { message: 'At most 256 characters' }),
 		email: z
 			.string({ required_error: 'Email is required' })
 			.min(1, { message: 'Email is required' })
 			.max(256, { message: 'Email must be less than 256 characters' })
 			.email({ message: 'Email must be a valid email address' }),
+		gender: z.enum(['Male', 'Female', 'Rather Not Say']),
 		password: z
 			.string({ required_error: 'Password is required' })
 			.min(8, { message: 'Password must be at least 8 characters' })
@@ -74,7 +80,30 @@
 									{$message}
 								</div>
 							{/if}
-
+							<h1 class="font-bold mt-6">Enter Name</h1>
+							<label for="name" class="input input-bordered flex items-center gap-2">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 16 16"
+									fill="currentColor"
+									class="w-4 h-4 opacity-70"
+									><path
+										d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z"
+									/></svg
+								>
+								<input
+									type="text"
+									placeholder="name"
+									name="name"
+									id="name"
+									disabled={isLoading}
+									bind:value={$form.name}
+									class="grow {$errors.name ? 'border-red-500' : null}"
+								/>
+								{#if $errors.name}
+									<small class="text-red-500">{$errors.name[0]}</small>
+								{/if}
+							</label>
 							<h1 class="font-bold mt-6">Enter Email</h1>
 							<label for="email" class="input input-bordered flex items-center gap-2">
 								<svg
@@ -101,7 +130,39 @@
 									<small class="text-red-500">{$errors.email[0]}</small>
 								{/if}
 							</label>
-
+							<label class="label text-left mt-3">
+								<span class="font-bold">Gender*</span>
+								<div class="flex justify-between leading-3">
+									<label class="label flex items-center space-x-2">
+										<input
+											class="radio"
+											type="radio"
+											checked
+											name="gender"
+											value="Male"
+											id="Male"
+											bind:group={$form.gender}
+										/>
+										<p class="pb-2">Male</p>
+									</label>
+									<label class="label flex items-center space-x-2">
+										<input
+											class="radio"
+											type="radio"
+											name="gender"
+											value="Female"
+											id="Female"
+											bind:group={$form.gender}
+										/>
+										<p class="pb-2">Female</p>
+									</label>
+								</div>
+								{#if $errors.gender}
+									<div>
+										<small class="text-red-500">{$errors.gender}</small>
+									</div>
+								{/if}
+							</label>
 							<h1 class="font-bold mt-4">Enter Password</h1>
 							<label for="password" class="input input-bordered flex items-center gap-2">
 								<svg
@@ -132,7 +193,7 @@
 								{#if isLoading}
 									<span class="loading loading-spinner loading-xs"></span>
 								{/if}
-								Sign In
+								Sign Up
 							</button>
 						</form>
 					</div>

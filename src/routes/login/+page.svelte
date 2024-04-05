@@ -35,7 +35,7 @@
 		isLoading = true;
 		setTimeout(() => {
 			isLoading = false;
-		}, 10000);
+		}, 5000);
 	}
 </script>
 
@@ -76,7 +76,7 @@
 							{/if}
 
 							<h1 class="font-bold mt-6">Enter Email</h1>
-							<label for="email" class="input input-bordered flex items-center gap-2">
+							<label for="email" class="input input-bordered flex items-center gap-2 {$errors.email ? 'border-red-500' : null}">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 16 16"
@@ -89,21 +89,22 @@
 									/></svg
 								>
 								<input
+									required
 									type="text"
 									placeholder="name@domain.com"
 									name="email"
 									id="email"
 									disabled={isLoading}
 									bind:value={$form.email}
-									class="grow {$errors.email ? 'border-red-500' : null}"
 								/>
-								{#if $errors.email}
-									<small class="text-red-500">{$errors.email[0]}</small>
-								{/if}
+								
 							</label>
+							{#if $errors.email}
+									<small class="text-red-500">{$errors.email[0]}</small>
+							{/if}
 
 							<h1 class="font-bold mt-4">Enter Password</h1>
-							<label for="password" class="input input-bordered flex items-center gap-2">
+							<label for="password" class="input input-bordered flex items-center gap-2 {$errors.password ? 'border-red-500' : null}">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 16 16"
@@ -116,17 +117,18 @@
 									/></svg
 								>
 								<input
+									required
 									type="password"
-									class="grow {$errors.password ? 'border-red-500' : null}"
 									name="password"
 									id="password"
 									disabled={isLoading}
 									bind:value={$form.password}
 								/>
-								{#if $errors.password}
-									<small class="text-red-500">{$errors.password[0]}</small>
-								{/if}
+								
 							</label>
+							{#if $errors.password}
+								<small class="text-red-500">{$errors.password[0]}</small>
+							{/if}
 
 							<button type="submit" class="btn btn-accent mt-8 w-full" disabled={isLoading}>
 								{#if isLoading}

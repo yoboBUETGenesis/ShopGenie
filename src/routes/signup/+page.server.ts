@@ -34,17 +34,17 @@ const userSchema = z.object({
 });
 
 export const actions = {
-    login: async (event) => {
+    register: async (event) => {
         console.log("backend e aschi");
         const form = await superValidate(event, userSchema);
-        console.log(form);
+        // console.log(form);
 
         if (!form.valid) {
             return message(form, 'Invalid form')
         }
 
         const body = form.data;
-        console.log(body)
+        // console.log(body)
 
 
 

@@ -41,7 +41,7 @@
 		isLoading = true;
 		setTimeout(() => {
 			isLoading = false;
-		}, 10000);
+		}, 5000);
 	}
 </script>
 
@@ -66,7 +66,7 @@
 					<div class=" md:p-1 md:m-5">
 						<form
 							use:enhance
-							action="?/login"
+							action="?/register"
 							method="post"
 							class="mt-6"
 							on:submit={() => {
@@ -81,7 +81,8 @@
 								</div>
 							{/if}
 							<h1 class="font-bold mt-6">Enter Name</h1>
-							<label for="name" class="input input-bordered flex items-center gap-2">
+
+							<label for="name" class="input input-bordered flex items-center gap-2 {$errors.name ? 'border-red-500' : null}">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 16 16"
@@ -92,20 +93,21 @@
 									/></svg
 								>
 								<input
+									required
 									type="text"
 									placeholder="name"
 									name="name"
 									id="name"
 									disabled={isLoading}
 									bind:value={$form.name}
-									class="grow {$errors.name ? 'border-red-500' : null}"
 								/>
-								{#if $errors.name}
-									<small class="text-red-500">{$errors.name[0]}</small>
-								{/if}
 							</label>
+							{#if $errors.name}
+								<small class="text-red-500">{$errors.name[0]}</small>
+							{/if}
 							<h1 class="font-bold mt-6">Enter Email</h1>
-							<label for="email" class="input input-bordered flex items-center gap-2">
+
+							<label for="email" class="input input-bordered flex items-center gap-2 {$errors.email ? 'border-red-500' : null}">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 16 16"
@@ -118,23 +120,25 @@
 									/></svg
 								>
 								<input
-									type="text"
+									required
+									type="email"
 									placeholder="name@domain.com"
 									name="email"
 									id="email"
 									disabled={isLoading}
 									bind:value={$form.email}
-									class="grow {$errors.email ? 'border-red-500' : null}"
 								/>
-								{#if $errors.email}
-									<small class="text-red-500">{$errors.email[0]}</small>
-								{/if}
+								
 							</label>
+							{#if $errors.email}
+								<small class="text-red-500">{$errors.email[0]}</small>
+							{/if}
 							<label class="label text-left mt-3">
 								<span class="font-bold">Gender*</span>
 								<div class="flex justify-between leading-3">
 									<label class="label flex items-center space-x-2">
 										<input
+											required
 											class="radio"
 											type="radio"
 											checked
@@ -147,6 +151,7 @@
 									</label>
 									<label class="label flex items-center space-x-2">
 										<input
+											required
 											class="radio"
 											type="radio"
 											name="gender"
@@ -157,14 +162,15 @@
 										<p class="pb-2">Female</p>
 									</label>
 								</div>
-								{#if $errors.gender}
+								<!-- {#if $errors.gender}
 									<div>
 										<small class="text-red-500">{$errors.gender}</small>
 									</div>
-								{/if}
+								{/if} -->
 							</label>
 							<h1 class="font-bold mt-4">Enter Password</h1>
-							<label for="password" class="input input-bordered flex items-center gap-2">
+
+							<label for="password" class="input input-bordered flex items-center gap-2 {$errors.password ? 'border-red-500' : null}">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 16 16"
@@ -178,17 +184,15 @@
 								>
 								<input
 									type="password"
-									class="grow {$errors.password ? 'border-red-500' : null}"
 									name="password"
 									id="password"
 									disabled={isLoading}
 									bind:value={$form.password}
 								/>
-								{#if $errors.password}
-									<small class="text-red-500">{$errors.password[0]}</small>
-								{/if}
 							</label>
-
+							{#if $errors.password}
+								<small class="text-red-500">{$errors.password[0]}</small>
+							{/if}
 							<button type="submit" class="btn btn-accent mt-8 w-full" disabled={isLoading}>
 								{#if isLoading}
 									<span class="loading loading-spinner loading-xs"></span>

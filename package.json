@@ -39,6 +39,9 @@
 	"type": "module",
 	"dependencies": {
 		"@supabase/auth-helpers-sveltekit": "^0.12.0",
-		"@supabase/supabase-js": "^2.42.0"
+		"@supabase/supabase-js": "^2.42.0",
+		"@qdrant/js-client-rest": "^1.8.1",
+		"dotenv": "^16.4.5",
+		"openai": "^4.32.1"
 	}
 }

@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
 // @ts-nocheck
     import { onMount } from 'svelte';
     import json from '../../dataset.json'
@@ -22,14 +22,12 @@
             console.error(error);
         }
     })
-</script>
+</script> -->
 
-<div>
+<!-- <div>
     
     <div class="relative">
-        <!-- <div class="h-[100vh] w-full absolute top-0 bg-slate-500 secondAnimation">
-            
-        </div> -->
+        
         <div class="h-[100vh] w-full absolute top-0 bg-blue-500 firstAnimation">
             
         </div>
@@ -45,10 +43,9 @@
         
     </div>
 
-</div>
+</div> -->
 
-
-<style>
+<!-- <style>
 
     @keyframes leftToRight{
         0% {
@@ -75,4 +72,4 @@
         animation-delay: 1s;
     }
 
-</style>
+</style> -->

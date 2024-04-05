@@ -51,226 +51,76 @@ export const load = async ({ locals: { supabase, getSession } }) => {
 }
 
 export const actions = {
-    addWorkExperiences: async ({ request, locals: { supabase, getSession } }) => {
+
+    addPic: async ({ request, locals: { supabase, getSession } }) => {
         const data = await request.formData();
         //console.log("amar add class form holo", data);
 
         let newClass = Object.fromEntries(data.entries()) as any;
+        let timeNow = new Date();
+        let name = userNow.id + "_" + timeNow;
 
-        let name = userNow.id + "_" + newClass.WorkExperiencesInstitute;
+
 
         //console.log(newClass.title, newClass.syllabus, newClass.start, newClass.duration, name)
 
-        if (newClass.WorkExperiencesImage.size) {
+        if (newClass.pic.size) {
             // console.log(newClass.image);
             const { data: res, error: err } = await supabase.storage
-                .from('workExperiences')
-                .upload(name, newClass.WorkExperiencesImage, {
+                .from('userpics')
+                .upload(name, newClass.pic, {
                     cacheControl: '3600',
                     upsert: false
                 });
 
             const { data: link } = await supabase
                 .storage
-                .from('workExperiences')
+                .from('userpics')
                 .getPublicUrl(name)
 
 
             console.log(err, link)
-
-            const { data: dt, error: err1 } = await supabase
-                .from('past')
-                .insert([
-                    { userid: userNow.id, from: newClass.WorkExperiencesFrom.toString(), to: newClass.WorkExperiencesTo.toString(), institute: newClass.WorkExperiencesInstitute, position: newClass.WorkExperiencesPosition, image: link.publicUrl }
-                ])
+            console.log("okk")
 
 
-            if (err1) console.log(err1)
+            const { data, error: err1 } = await supabase
+                .from('userdetails')
+                .update({ image: link.publicUrl })
+                .eq('id', userNow.id)
 
-        }
-        else {
-
-            const { data: dt, error: err1 } = await supabase
-                .from('past')
-                .insert([
-                    { userid: userNow.id, from: newClass.WorkExperiencesFrom.toString(), to: newClass.WorkExperiencesTo.toString(), institute: newClass.WorkExperiencesInstitute, position: newClass.WorkExperiencesPosition }
-                ])
 
 
             if (err1) console.log(err1)
 
         }
 
-
-
-        throw redirect(303, '/protected/profile');
+        throw redirect(303, '/auth/profile');
     },
-    addCurrentAffliation: async ({ request, locals: { supabase, getSession } }) => {
+
+
+
+    addDob: async ({ request, locals: { supabase, getSession } }) => {
         const data = await request.formData();
         //console.log("amar add class form holo", data);
 
         let newClass = Object.fromEntries(data.entries()) as any;
 
-        let name = userNow.id + "_" + newClass.PresentInstitute;
+
+
 
         //console.log(newClass.title, newClass.syllabus, newClass.start, newClass.duration, name)
 
-        if (newClass.PresentImage.size) {
-            // console.log(newClass.image);
-            const { data: res, error: err } = await supabase.storage
-                .from('workPresent')
-                .upload(name, newClass.PresentImage, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
+        const { data: dtt, error: err1 } = await supabase
+            .from('userdetails')
+            .update({ dob: newClass.dob })
+            .eq('id', userNow.id)
 
-            const { data: link } = await supabase
-                .storage
-                .from('workPresent')
-                .getPublicUrl(name)
-
-
-            console.log(err, link)
-
-            const { data: dt, error: err1 } = await supabase
-                .from('present')
-                .insert([
-                    { userid: userNow.id, from: newClass.PresentFrom.toString(), institute: newClass.PresentInstitute, position: newClass.PresentPosition, image: link.publicUrl }
-                ])
-
-
-            if (err1) console.log(err1)
-
-        }
-        else {
-
-            const { data: dt, error: err1 } = await supabase
-                .from('present')
-                .insert([
-                    { userid: userNow.id, from: newClass.PresentFrom.toString(), institute: newClass.PresentInstitute, position: newClass.PresentPosition }
-                ])
-
-
-            if (err1) console.log(err1)
-
-        }
-
-
-
-        throw redirect(303, '/protected/profile');
-    },
-    addSkill: async ({ request, locals: { supabase, getSession } }) => {
-        const data = await request.formData();
-        //console.log("amar add class form holo", data);
-
-        let newClass = Object.fromEntries(data.entries()) as any;
-
-
-        const { data: dt, error: err1 } = await supabase
-            .from('skills')
-            .insert([
-                { userid: userNow.id, body: newClass.skillsbody }
-            ])
 
 
         if (err1) console.log(err1)
 
 
 
-
-
-        throw redirect(303, '/protected/profile');
+        throw redirect(303, '/auth/profile');
     },
-    addCertificate: async ({ request, locals: { supabase, getSession } }) => {
-        const data = await request.formData();
-        //console.log("amar add class form holo", data);
-
-        let newClass = Object.fromEntries(data.entries()) as any;
-
-        let name = userNow.id + "_" + newClass.certicicatesIssuer;
-
-        //console.log(newClass.title, newClass.syllabus, newClass.start, newClass.duration, name)
-
-        if (newClass.certicicatesImage.size) {
-            // console.log(newClass.image);
-            const { data: res, error: err } = await supabase.storage
-                .from('certificates')
-                .upload(name, newClass.certicicatesImage, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
-
-            const { data: link } = await supabase
-                .storage
-                .from('certificates')
-                .getPublicUrl(name)
-
-
-            console.log(err, link)
-
-            const { data: dt, error: err1 } = await supabase
-                .from('certificates')
-                .insert([
-                    { userid: userNow.id, received: newClass.certicicatesReceived.toString(), issuer: newClass.certicicatesIssuer, name: newClass.certicicatesName, image: link.publicUrl, link: newClass.certicicatesLink }
-                ])
-
-
-            if (err1) console.log(err1)
-
-        }
-        else {
-
-            const { data: dt, error: err1 } = await supabase
-                .from('certificates')
-                .insert([
-                    { userid: userNow.id, received: newClass.certicicatesReceived.toString(), issuer: newClass.certicicatesIssuer, name: newClass.certicicatesName, link: newClass.certicicatesLink }
-                ])
-
-
-            if (err1) console.log(err1)
-
-        }
-
-
-
-        throw redirect(303, '/protected/profile');
-    },
-    // deleteTodo: async ({ url, locals: { supabase, getSession } }) => {
-    //     const todoid = url.searchParams.get("id")
-    //     console.log("ami todo delete korte chai ", todoid);
-
-    //     if (!todoid) {
-    //         return fail(400, { message: "Invalid request" })
-    //     }
-
-    //     const { error: err } = await supabase
-    //         .from('todo')
-    //         .delete()
-    //         .eq("id", todoid)
-
-    //     if (err) console.log(err)
-    //     else throw redirect(303, '/protected/planner');
-
-    // },
-    // enroll: async ({ url, locals: { supabase, getSession } }) => {
-    //     const cid = url.searchParams.get("id")
-    //     // console.log("ami todo Update korte chai ", todoid);
-
-    //     if (!cid) {
-    //         return fail(400, { message: "Invalid request" })
-    //     }
-
-
-    //     const { data: dtt, error: err1 } = await supabase
-    //         .from('studclass')
-    //         .insert([
-    //             { sid: userNow.id, cid: cid },
-    //         ])
-
-
-    //     if (err1) return fail(400, { message: "Invalid request" })
-    //     else throw redirect(303, '/protected/learning');
-
-    // },
-
 }

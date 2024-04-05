@@ -135,6 +135,9 @@
 								Sign In
 							</button>
 						</form>
+						<a href="/signup" class="mt-4 font-semibold hover:text-blue-400">
+							Don't Have an account? Hop right in 🔥
+						</a>
 					</div>
 				</div>
 			</div>

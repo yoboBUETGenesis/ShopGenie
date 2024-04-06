@@ -52,6 +52,22 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         'men wallets', 'men boots', 'men canvas', 'men casual-shoes',
         'men formal-shoes', 'men sandals', 'men sports-sandals', 'men sports-shoes']
 
+    menAll['new arrivals'] = await client.scroll(collectionName, {
+        filter: {
+            must: [
+                {
+                    key: "Category",
+                    match: {
+                        "any": ['men new-arrivals']
+                    },
+                },
+            ],
+        },
+        limit: 4,
+        with_payload: true,
+        with_vector: false,
+    });
+
     menAll['panjabi'] = await client.scroll(collectionName, {
         filter: {
             must: [
@@ -97,7 +113,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_payload: true,
         with_vector: false,
     });
-    menAll['formal_pant'] = await client.scroll(collectionName, {
+    menAll['formal pant'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
@@ -113,7 +129,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_vector: false,
     });
     console.log("ok so far");
-    menAll['casual_pant'] = await client.scroll(collectionName, {
+    menAll['casual pant'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
@@ -143,7 +159,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_payload: true,
         with_vector: false,
     });
-    menAll['Coaty/Fatua'] = await client.scroll(collectionName, {
+    menAll['Coaty-Fatua'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
@@ -160,21 +176,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
     });
     console.log("ok so far 333");
 
-    menAll['new_arrivals'] = await client.scroll(collectionName, {
-        filter: {
-            must: [
-                {
-                    key: "Category",
-                    match: {
-                        "any": ['men new-arrivals']
-                    },
-                },
-            ],
-        },
-        limit: 4,
-        with_payload: true,
-        with_vector: false,
-    });
+
 
     menAll['wallets'] = await client.scroll(collectionName, {
         filter: {
@@ -192,63 +194,14 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_vector: false,
     });
 
-    // menAll['fatua'] = await client.scroll(collectionName, {
-    //     filter: {
-    //         must: [
-    //             {
-    //                 key: "Category",
-    //                 match: {
-    //                     "any": ['men fatua']
-    //                 },
-    //             },
-    //         ],
-    //     },
-    //     limit: 4,
-    //     with_payload: true,
-    //     with_vector: false,
-    // });
-
-    // menAll['shoes'] = await client.scroll(collectionName, {
-    //     filter: {
-    //         must: [
-    //             {
-    //                 key: "Category",
-    //                 match: {
-    //                     "any": ['men casual-shoes',
-    //                         'men formal-shoes']
-    //                 },
-    //             },
-    //         ],
-    //     },
-    //     limit: 4,
-    //     with_payload: true,
-    //     with_vector: false,
-    // });
-
-    // menAll['sports_shoes'] = await client.scroll(collectionName, {
-    //     filter: {
-    //         must: [
-    //             {
-    //                 key: "Category",
-    //                 match: {
-    //                     "any": ['men sports-sandals', 'men sports-shoes']
-    //                 },
-    //             },
-    //         ],
-    //     },
-    //     limit: 4,
-    //     with_payload: true,
-    //     with_vector: false,
-    // });
-
     menAll['Footwear'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
                     key: "Category",
                     match: {
-                        "any": ['men boots', 'men canvas', 'men footwear','men casual-shoes',
-                        'men formal-shoes', 'men sports-sandals', 'men sports-shoes']
+                        "any": ['men boots', 'men canvas', 'men footwear', 'men casual-shoes',
+                            'men formal-shoes', 'men sports-sandals', 'men sports-shoes']
                     },
                 },
             ],

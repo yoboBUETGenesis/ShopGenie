@@ -66,7 +66,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_payload: true,
         with_vector: false,
     });
-    boyAll['t_shirt'] = await client.scroll(collectionName, {
+    boyAll['t-shirt'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
@@ -111,7 +111,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_payload: true,
         with_vector: false,
     });
-    boyAll['daily_life'] = await client.scroll(collectionName, {
+    boyAll['daily-life'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
@@ -141,7 +141,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_payload: true,
         with_vector: false,
     });
-    boyAll['winterwear'] = await client.scroll(collectionName, {
+    boyAll['winter-wear'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {

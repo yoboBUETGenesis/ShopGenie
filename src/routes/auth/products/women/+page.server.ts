@@ -50,6 +50,21 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         'women jumpsuits', 'women leggings & jeggings', 'women skirts', 'women tops',
         'women tunics', 'women winterwear', 'women canvas', 'women heels',]
 
+    womenAll['new arrivals'] = await client.scroll(collectionName, {
+        filter: {
+            must: [
+                {
+                    key: "Category",
+                    match: {
+                        "any": ['women new-arrivals']
+                    },
+                },
+            ],
+        },
+        limit: 4,
+        with_payload: true,
+        with_vector: false,
+    });
     womenAll['panjabi-kurta'] = await client.scroll(collectionName, {
         filter: {
             must: [
@@ -57,6 +72,36 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                     key: "Category",
                     match: {
                         "any": ['women kurta', 'women panjabi']
+                    },
+                },
+            ],
+        },
+        limit: 4,
+        with_payload: true,
+        with_vector: false,
+    });
+    womenAll['saree'] = await client.scroll(collectionName, {
+        filter: {
+            must: [
+                {
+                    key: "Category",
+                    match: {
+                        "any": ['women saree']
+                    },
+                },
+            ],
+        },
+        limit: 4,
+        with_payload: true,
+        with_vector: false,
+    });
+    womenAll['casual'] = await client.scroll(collectionName, {
+        filter: {
+            must: [
+                {
+                    key: "Category",
+                    match: {
+                        "any": ['women shalwar-kameez', 'women scarves', 'women skirts']
                     },
                 },
             ],
@@ -112,37 +157,9 @@ export const load = async ({ locals: { supabase, getSession } }) => {
     });
 
 
-    womenAll['new_arrivals'] = await client.scroll(collectionName, {
-        filter: {
-            must: [
-                {
-                    key: "Category",
-                    match: {
-                        "any": ['women new-arrivals']
-                    },
-                },
-            ],
-        },
-        limit: 4,
-        with_payload: true,
-        with_vector: false,
-    });
-    womenAll['saree'] = await client.scroll(collectionName, {
-        filter: {
-            must: [
-                {
-                    key: "Category",
-                    match: {
-                        "any": ['women saree']
-                    },
-                },
-            ],
-        },
-        limit: 4,
-        with_payload: true,
-        with_vector: false,
-    });
-    womenAll['daily_life'] = await client.scroll(collectionName, {
+
+
+    womenAll['daily life'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
@@ -158,28 +175,14 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_payload: true,
         with_vector: false,
     });
-    womenAll['casual'] = await client.scroll(collectionName, {
-        filter: {
-            must: [
-                {
-                    key: "Category",
-                    match: {
-                        "any": ['women shalwar-kameez', 'women scarves', 'women skirts']
-                    },
-                },
-            ],
-        },
-        limit: 4,
-        with_payload: true,
-        with_vector: false,
-    });
+
     womenAll['footwear'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
                     key: "Category",
                     match: {
-                        "any": ['women canvas', 'women heels','women footwear']
+                        "any": ['women canvas', 'women heels', 'women footwear']
                     },
                 },
             ],

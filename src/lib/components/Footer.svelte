@@ -1,6 +1,6 @@
 
 <script>
-    import genie from './images/genie.png'
+    import genie from '../images/genie.png'
 </script>
 
 <footer class="footer p-[100px] bg-base-200 text-base-content">

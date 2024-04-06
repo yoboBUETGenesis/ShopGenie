@@ -43,8 +43,15 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
 
     let item = items[0];
 
+    let { data: cart, error: err2 } = await supabase
+        .from('cart')
+        .select("*")
+        .eq('uid', userNow.id)
+
+    let itemCount = cart?.length;
+
+    console.log(item)
 
 
-
-    return { userNow, item };
+    return { userNow, item,itemCount };
 }

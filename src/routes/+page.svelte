@@ -8,7 +8,7 @@
 	import genie from '$lib/images/genie.png';
 
 	import { writable } from 'svelte/store';
-	import Footer from '$lib/Footer.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 
 	let screenSize = writable('');
 

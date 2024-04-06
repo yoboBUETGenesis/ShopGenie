@@ -140,7 +140,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_payload: true,
         with_vector: false,
     });
-    womenAll['winter_wear'] = await client.scroll(collectionName, {
+    womenAll['winter wear'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {

@@ -1,4 +1,6 @@
 <script>
+// @ts-nocheck
+
 	import genie from '$lib/images/genie.png';
 	import { enhance } from '$app/forms';
 	import Themeswitcher from '$lib/themeswitcher.svelte';
@@ -104,6 +106,46 @@
 					<li><button on:click={handleSignOut}>Logout</button></li>
 				</ul>
 			</div>
+		</div>
+	</div>
+
+	<div class="flex items-center justify-center">
+		<div class="w-4/5">
+			{#each Object.keys(menAll) as key}
+			<div class="my-5">
+				<p class="text-[35px] font-bold uppercase py-5">{key}</p>
+	
+				<div class="flex md:gap-4">
+					{#each menAll[key]["points"] as item}
+					<div class="">
+						<div class="w-72 bg-white shadow-md rounded-xl overflow-hidden duration-500  hover:shadow-xl">
+							<a href="/auth/productview/{item.id}">
+								<img
+									src={item.payload.Image_links[0]}
+									alt="Product"
+									class="h-80 w-72 object-cover rounded-t-xl hover:scale-105"
+								/>
+								<div class="px-4 py-3 w-72">
+									<span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span>
+									<p class="text-lg font-bold text-black truncate block capitalize">{item.payload.Name}</p>
+									<div class="flex items-center">
+										<p class="text-lg font-semibold text-black cursor-auto my-3">{item.payload.Price}</p>
+									</div>
+								</div>
+							</a>
+							<form
+								action="?/deleteCartItem&id={item.id}"
+								method="POST"
+								class="flex flex-col items-center justify-center mb-2"
+							>
+								
+							</form>
+						</div>
+					</div>
+				{/each}
+				</div>
+			</div>
+		{/each}
 		</div>
 	</div>
 </nav>

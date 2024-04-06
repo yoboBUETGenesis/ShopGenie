@@ -12,8 +12,10 @@ const client = new QdrantClient({
 const collectionName = "products"
 
 let userNow;
+let prid;
 export const load = async ({ params, locals: { supabase, getSession } }) => {
     const productid = parseInt(params.pid);
+    prid = productid;
     const session = await getSession()
 
     if (!session) {
@@ -32,7 +34,13 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
     console.log(err);
     userNow = userdetails[0];
 
+    let { data: cart, error: err6 } = await supabase
+        .from('cart')
+        .select("*")
+        .eq('uid', userNow.id)
 
+
+    let itemCount = cart?.length;
 
 
     let items = await client.retrieve(collectionName, {
@@ -43,15 +51,35 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
 
     let item = items[0];
 
-    let { data: cart, error: err2 } = await supabase
+    let { data: cartok, error: err2 } = await supabase
         .from('cart')
         .select("*")
         .eq('uid', userNow.id)
+        .eq('pid', productid)
 
-    let itemCount = cart?.length;
+    // console.log(cartok, err2)
 
-    console.log(item)
+    // console.log(item)
 
 
-    return { userNow, item,itemCount };
+    return { userNow, item, itemCount, cartok };
+}
+export const actions = {
+    addtoCart: async ({ locals: { supabase, getSession } }) => {
+
+
+        // console.log("form", umail, taskname, description, deadline, importancescale)
+
+        const { data, error: err } = await supabase
+            .from('cart')
+            .insert([
+                { uid: userNow.id, pid: prid },
+            ])
+            .select()
+
+        if (err) console.log(err)
+
+        else throw redirect(303, `/auth/productview/${prid}`);
+    },
+
 }

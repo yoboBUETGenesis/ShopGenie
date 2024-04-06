@@ -50,37 +50,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         'girls frocks & dresses', 'girls leggings & jeggings', 'girls sweaters',
         'girls tops & t-shirts']
 
-    girlAll['Special'] = await client.scroll(collectionName, {
-        filter: {
-            must: [
-                {
-                    key: "Category",
-                    match: {
-                        "any": ['girls ghagra-choli', 'girls shalwar-kameez',]
-                    },
-                },
-            ],
-        },
-        limit: 3,
-        with_payload: true,
-        with_vector: false,
-    });
-    girlAll['winterwear'] = await client.scroll(collectionName, {
-        filter: {
-            must: [
-                {
-                    key: "Category",
-                    match: {
-                        "any": ['girls sweaters', 'girls shawls', 'girls sweaters-jackets',]
-                    },
-                },
-            ],
-        },
-        limit: 3,
-        with_payload: true,
-        with_vector: false,
-    });
-    girlAll['daily_life'] = await client.scroll(collectionName, {
+    girlAll['daily life'] = await client.scroll(collectionName, {
         filter: {
             must: [
                 {
@@ -96,6 +66,37 @@ export const load = async ({ locals: { supabase, getSession } }) => {
         with_payload: true,
         with_vector: false,
     });
+    girlAll['Special'] = await client.scroll(collectionName, {
+        filter: {
+            must: [
+                {
+                    key: "Category",
+                    match: {
+                        "any": ['girls ghagra-choli', 'girls shalwar-kameez',]
+                    },
+                },
+            ],
+        },
+        limit: 3,
+        with_payload: true,
+        with_vector: false,
+    });
+    girlAll['winter-wear'] = await client.scroll(collectionName, {
+        filter: {
+            must: [
+                {
+                    key: "Category",
+                    match: {
+                        "any": ['girls sweaters', 'girls shawls', 'girls sweaters-jackets',]
+                    },
+                },
+            ],
+        },
+        limit: 3,
+        with_payload: true,
+        with_vector: false,
+    });
+
     girlAll['casual'] = await client.scroll(collectionName, {
         filter: {
             must: [

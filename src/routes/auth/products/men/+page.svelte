@@ -4,8 +4,8 @@
 	import Themeswitcher from '$lib/themeswitcher.svelte';
 
 	export let data;
-	let { session, supabase, userNow, itemCount } = data;
-	$: ({ session, supabase, userNow, itemCount } = data);
+	let { session, supabase, userNow, menAll, itemCount } = data;
+	$: ({ session, supabase, userNow, menAll, itemCount } = data);
 	const handleSignOut = async () => {
 		console.log('logout start');
 		await data.supabase.auth.signOut();
@@ -96,18 +96,27 @@
 					class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
 				>
 					<li>
-						<a class="justify-between" href="/auth/profile">
+						<a href="/auth/profile" class="justify-between">
 							Profile
 							<span class="badge">New</span>
 						</a>
 					</li>
-
 					<li><button on:click={handleSignOut}>Logout</button></li>
 				</ul>
 			</div>
 		</div>
 	</div>
 </nav>
+<!-- href="/auth/product/man/{category}" -->
+
+<section
+	id="Projects"
+	class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+>
+	{#each menAll as category}{/each}
+</section>
+
+<pre>{JSON.stringify(menAll, null, 2)}</pre>
 
 <style>
 	.links {

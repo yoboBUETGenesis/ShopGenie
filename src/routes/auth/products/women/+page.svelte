@@ -30,7 +30,12 @@
 			isLoading = false;
 		}, 2000);
 	});
-
+	function scrollToElement(id) {
+		const element = document.getElementById(id);
+		if (element) {
+		element.scrollIntoView({ behavior: 'smooth' });
+		}
+	}
 </script>
 
 <Productnavbar {userNow} {itemCount} />
@@ -40,14 +45,25 @@
 <div>
 
 	{#if isLoading}
-	<div class="flex items-center justify-center">
-		<div class="w-4/5">
+	<div class="flex justify-center">
+		<div class="w-1/5 ">
+				
+			<div class="list-none md:mt-16 md:sticky top-44">
+				<p class="skeleton w-4/5 h-4"></p>
+				{#each Array(6) as _,i}
+					<li class="skeleton h-4 w-1/3 my-2  ">
+					</li>
+				{/each}
+			</div>
+
+		</div>
+		<div class="w-3/5">
 			{#each Array(5) as _,i}
 				<div class="my-5">
 					<div class="skeleton h-6 w-56 p-4 m-4"></div>
 
 					<div class="flex md:gap-4">
-						{#each Array(4) as _,j}
+						{#each Array(3) as _,j}
 							<div class="">
 								<div
 									class="w-72 bg-white  shadow-md rounded-xl overflow-hidden duration-500 hover:shadow-xl"
@@ -80,7 +96,7 @@
 					<p class="px-5 pl-6 text-[30px] font-bold border-b-[2px]">Category</p>
 					{#each Object.keys(womenAll) as key}
 						<li class="cursor-pointer p-0 pl-6 m-2 mx-5  text-[24px] uppercase border-b-2 hover:scale-105">
-							<a href={"#"+key}>{key}</a> 
+							<button on:click={()=>scrollToElement(key)}>{key}</button>
 						</li>
 					{/each}
 				</div>

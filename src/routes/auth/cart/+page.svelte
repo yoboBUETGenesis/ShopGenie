@@ -98,12 +98,7 @@
 					class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
 				>
 					<li>
-<<<<<<< HEAD
-						<a href="/auth/profile" class="justify-between" >
-=======
-						<!-- svelte-ignore a11y-missing-attribute -->
-						<a class="justify-between">
->>>>>>> da793b6238358abace3ca0854ef3bc66c65b1ad6
+						<a href="/auth/profile" class="justify-between">
 							Profile
 							<span class="badge">New</span>
 						</a>

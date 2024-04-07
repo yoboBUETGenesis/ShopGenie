@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import Themeswitcher from '$lib/themeswitcher.svelte';
 	import { onMount } from 'svelte';
+	import { json } from '@sveltejs/kit';
 	// import { Pulse } from 'svelte-loading-spinners';
 
 	let recognizedSpeech = '';
@@ -35,13 +36,13 @@
 			const formData = new FormData();
 			formData.append('audioFile', recordedAudioFile);
 
-			const ret = await fetch('/api/transcribe', {
-				method: 'POST',
-				body: formData
-			});
+			// const ret = await fetch('/api/transcribe', {
+			// 	method: 'POST',
+			// 	body: formData
+			// });
 
-			const res = await ret.json();
-			recognizedSpeech = res['text'];
+			// const res = await ret.json();
+			// recognizedSpeech = res['text'];
 
 			chunks = [];
 		};
@@ -66,8 +67,8 @@
 		window.open('/login', '_self');
 	};
 
-	let image;
-	let textquery;
+	let image: any;
+	let textquery: string;
 	let audio;
 	let showaddmodal = true;
 
@@ -88,6 +89,43 @@
 	// 	}
 	// 	form?.success = "";
 	// }
+
+	let textSearchResult = []
+	let imageSearchResult = []
+
+	async function textSubmit() {
+		// console.log(textquery);
+		let payload = {text: textquery}
+		// console.log(payload)
+		
+		// console.log("Here")
+		const ret = await fetch('/api/summary-search', {
+			method: 'POST',
+			body: JSON.stringify(payload)
+		});
+		// console.log(ret)
+
+		const res = await ret.json()
+		// console.log(res)
+		textSearchResult = res["list"]
+
+		// console.log(textSearchResult) 
+		// console.log("Here")
+		textquery = ""
+	}
+
+	async function imageSubmit(event: Event) {
+		const formData = new FormData(event.target as HTMLFormElement);
+		
+		const ret = await fetch('/api/image-search', {
+			method: 'POST',
+			body: formData
+		});
+		const res = await ret.json()
+		imageSearchResult = res["list"]
+
+		console.log(imageSearchResult)
+	}
 </script>
 
 <nav class="p-4">
@@ -182,26 +220,17 @@
 	</div>
 </nav>
 
-{#if showaddmodal}
-	<div class="p-6 rounded-lg w-full m-4 dark:bg-[#212020]">
-		<div class="flex flex-col justify-center items-center mb-3">
-			<h2 class="text-2xl font-bold font-serif">Input For Query</h2>
-		</div>
+<div class="p-6 rounded-lg w-full m-4 dark:bg-[#212020]">
+	<div class="flex flex-col justify-center items-center mb-3">
+		<h2 class="text-2xl font-bold font-serif">Input For Query</h2>
+	</div>
 
-		<form
-			use:enhance
-			action="?/upload"
-			method="POST"
-			class="space-x-4"
-			enctype="multipart/form-data"
-			on:submit={() => {
-				closeclassmodal();
-			}}
-		>
-			<div class="flex flex-row space-x-10">
-				<div class="w-1/3">
-					<h1>Textual Query</h1>
-
+		<div class="flex flex-row space-x-10">
+			<div class="w-1/3">
+				<h1>Textual Query</h1>
+				<form
+					on:submit|preventDefault={textSubmit}
+				>
 					<input
 						class="input input-bordered dark:placeholder:text-[#ffffff9e] w-full max-w-xs"
 						type="text"
@@ -210,56 +239,72 @@
 						bind:value={textquery}
 						placeholder="Enter The Query"
 					/>
-				</div>
-				<div class="w-1/3">
-					<h1>Photo (optional)</h1>
-
-					<input
-						class="file-input w-full max-w-xs"
-						type="file"
-						id="image"
-						name="image"
-						bind:value={image}
-					/>
-				</div>
-				{#if hearingRunning}
 					<button
-						class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
-						disabled={true}
-						on:click={handleHearingStart}
+						type="submit"
+						class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
 					>
-						Recording
+						Submit
 					</button>
-				{:else}
-					<button
-						class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
-						on:click={handleHearingStart}>Hearing Start</button
-					>
-				{/if}
-				{#if hearingRunning}
-					<button
-						class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
-						on:click={handleHearingStop}>Hearing Stop</button
-					>
-				{:else}
-					<button
-						class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
-						disabled
-						on:click={handleHearingStop}>Hearing Stop</button
-					>
-				{/if}
+				</form>
 			</div>
-			<div class="mt-9 flex flex-col items-center justify-center">
+			<div class="w-1/3">
+				<h1>Photo (optional)</h1>
+				<form
+					on:submit|preventDefault={imageSubmit}
+					enctype="multipart/form-data"
+				>
+				<input
+					class="file-input w-full max-w-xs"
+					type="file"
+					id="image"
+					name="image"
+					bind:value={image}
+				/>
 				<button
 					type="submit"
 					class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
 				>
 					Submit
 				</button>
+			</form>
 			</div>
-		</form>
-	</div>
-{/if}
+			{#if hearingRunning}
+				<button
+					class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
+					disabled={true}
+					on:click={handleHearingStart}
+				>
+					Recording
+				</button>
+			{:else}
+				<button
+					class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
+					on:click={handleHearingStart}>Hearing Start</button
+				>
+			{/if}
+			{#if hearingRunning}
+				<button
+					class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
+					on:click={handleHearingStop}>Hearing Stop</button
+				>
+			{:else}
+				<button
+					class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
+					disabled
+					on:click={handleHearingStop}>Hearing Stop</button
+				>
+			{/if}
+		</div>
+		<div class="mt-9 flex flex-col items-center justify-center">
+			<button
+				type="submit"
+				class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
+			>
+				Submit
+			</button>
+		</div>
+
+</div>
 
 <style>
 	.links {

@@ -14,7 +14,7 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY_2 || ''
 });
 
-let userNow;
+let userNow: any;
 export const load = async ({ locals: { supabase, getSession } }) => {
     const session = await getSession()
 
@@ -96,6 +96,7 @@ export const actions = {
         // throw redirect(303, '/auth/query');
     },
     audio: async ({ request, locals: { supabase, getSession } }) => {
+        console.log("HERE")
         const formData = (await request.formData()) as any;
         const audioFile = formData.get('audioFile');
         const textQ = formData.get('textquery');

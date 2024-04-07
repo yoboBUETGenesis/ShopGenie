@@ -39,7 +39,7 @@
 	}
 </script>
 
-<div class="titleSection md:h-[100vh]">
+<div class="titleSection h-[100vh]">
 	<div class="flex items-center justify-center h-full w-full">
 		<div class=" md:w-[60%] w-[80%] my-8 md:my-0 md:h-[75%] bg-[#ffffffa1]">
 			<div class="w-full h-full grid md:grid-cols-[50%_auto]">
@@ -184,10 +184,6 @@
 		0% {
 			transform: translateX(100%);
 		}
-		50% {
-			transform: translateX(-50%);
-		}
-
 		100% {
 			transform: translateX(0);
 		}

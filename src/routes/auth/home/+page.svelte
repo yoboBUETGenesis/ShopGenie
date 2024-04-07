@@ -61,7 +61,8 @@
 					</li>
 				</ul>
 				<div class="dropdown dropdown-end ml-5">
-					<div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<div tabindex="0" role="button" class="btn btn-ghost btn-circle " on:click={gotocart}>
 						<div class="indicator">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -79,7 +80,7 @@
 							<span class="badge badge-sm indicator-item">{itemCount}</span>
 						</div>
 					</div>
-					<div
+					<!-- <div
 						tabindex="0"
 						class="mt-3 z-[1] card card-compact dropdown-content w-52 bg-base-100 shadow"
 					>
@@ -89,7 +90,7 @@
 								<button class="btn btn-primary btn-block" on:click={gotocart}>View cart</button>
 							</div>
 						</div>
-					</div>
+					</div> -->
 				</div>
 				<div class="dropdown dropdown-end ml-3">
 					<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">

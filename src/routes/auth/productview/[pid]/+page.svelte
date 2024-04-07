@@ -194,14 +194,24 @@
 					</div>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<div
-						class="flex flex-row space-x-3 p-2 items-center justify-center rounded-lg bg-gray-200 hover:scale-105 hover:bg-gray-400"
+						class="flex flex-row space-x-3 px-2 items-center justify-center  border-[2px] border-black hover:scale-105 hover:bg-gray-100"
 						on:click={addReviewModel}
 					>
-						<img
+						<!-- <img
 							src="https://dxpcgmtdvyvcxbaffqmt.supabase.co/storage/v1/object/public/demo/plus-add-svgrepo-com.svg"
 							alt="Dashboard Icon"
 							class="h-6 mr-1 hover:rotate-12"
-						/>
+						/> -->
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="3"
+							stroke="currentColor"
+							class="w-7 h-7"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+						</svg>
 						<h1>Add New Review</h1>
 					</div>
 				</div>

@@ -5,17 +5,19 @@
 	import allen from '$lib/images/Allen.svg';
 	import apex from '$lib/images/apex.png';
 	import Slider from '$lib/components/Slider.svelte';
-
+	import { onMount } from 'svelte';
+	import Chart from 'chart.js/auto';
+	import genie from '$lib/images/genie.png';
+	import Themeswitcher from '$lib/themeswitcher.svelte';
 	export let data;
-	let { session, supabase, userNow, item, itemCount, cartok, recommendation, reviews } = data;
-	$: ({ session, supabase, userNow, item, itemCount, cartok, recommendation, reviews } = data);
+	let { session, supabase, userNow, item, itemCount, cartok, recommendation, groupedReviews } =
+		data;
+	$: ({ session, supabase, userNow, item, itemCount, cartok, recommendation, groupedReviews } =
+		data);
 	const handleSignOut = async () => {
 		await data.supabase.auth.signOut();
 		window.open('/login', '_self');
 	};
-
-	import genie from '$lib/images/genie.png';
-	import Themeswitcher from '$lib/themeswitcher.svelte';
 
 	function gotocart() {
 		window.open('/auth/cart', '_self');
@@ -35,6 +37,50 @@
 
 	function closeReviewModel() {
 		showaddmodal = false;
+	}
+	let chart = null; // This will hold the chart instance
+	let chartContainer;
+
+	$: if (groupedReviews && chartContainer) {
+		setupChart();
+	}
+
+	function setupChart() {
+		const ctx = chartContainer.getContext('2d');
+
+		// Destroy the old chart if it exists
+		if (chart) {
+			chart.destroy();
+		}
+
+		// Setup the new chart with the current data
+		chart = new Chart(ctx, {
+			type: 'pie',
+			data: {
+				labels: ['Positive', 'Negative', 'Neutral'],
+				datasets: [
+					{
+						data: [
+							groupedReviews.positive?.length || 0,
+							groupedReviews.negative?.length || 0,
+							groupedReviews.neutral?.length || 0
+						],
+						backgroundColor: [
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(255, 99, 132, 0.2)',
+							'rgba(255, 205, 86, 0.2)'
+						],
+						borderColor: ['rgb(75, 192, 192)', 'rgb(255, 99, 132)', 'rgb(255, 205, 86)'],
+						borderWidth: 1
+					}
+				]
+			},
+			options: {
+				animation: {
+					animateScale: true
+				}
+			}
+		});
 	}
 </script>
 
@@ -203,30 +249,43 @@
 				</div>
 				{#if isOpenReview}
 					<div class="text-[23px] ml-4 text-justify text-[#5a5a59]">
-						<h1 class="font-semibold">Positive Reviews</h1>
-						{#each reviews as review}
-							{#if review.sentiment === 'positive'}
-								<p>
-									{review.body}
-								</p>
+						{#if groupedReviews}
+							<canvas bind:this={chartContainer} width="400" height="400"></canvas>
+							<h1 class="font-semibold">Positive Reviews</h1>
+							{#if groupedReviews.positive}
+								{#each groupedReviews.positive as review}
+									<p>
+										{review.body}
+									</p>
+								{/each}
+							{:else}
+								<p>No positive reviews</p>
 							{/if}
-						{/each}
-						<h1 class="font-semibold">Negative Reviews</h1>
-						{#each reviews as review}
-							{#if review.sentiment === 'negative'}
-								<p>
-									{review.body}
-								</p>
+							<h1 class="font-semibold">Negative Reviews</h1>
+							{#if groupedReviews.negative}
+								<ul>
+									{#each groupedReviews.negative as review}
+										<li>
+											{review.body}
+										</li>
+									{/each}
+								</ul>
+							{:else}
+								<p>No negative review</p>
 							{/if}
-						{/each}
-						<h1 class="font-semibold">Neutral Reviews</h1>
-						{#each reviews as review}
-							{#if review.sentiment === 'neutral'}
-								<p>
-									{review.body}
-								</p>
+							<h1 class="font-semibold">Neutral Reviews</h1>
+							{#if groupedReviews.neutral}
+								{#each groupedReviews.neutral as review}
+									<p>
+										{review.body}
+									</p>
+								{/each}
+							{:else}
+								<p>No neutral review</p>
 							{/if}
-						{/each}
+						{:else}
+							<p>No reviews Yet</p>
+						{/if}
 					</div>
 				{/if}
 
@@ -426,7 +485,7 @@
 		</section>
 	</div>
 </div>
-<pre>{JSON.stringify(item, null, 2)}</pre>
+<pre>{JSON.stringify(groupedReviews, null, 2)}</pre>
 
 <style>
 	.links {

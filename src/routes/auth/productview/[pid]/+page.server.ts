@@ -82,18 +82,31 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
         .select("*")
         .eq('pid', prid)
 
+    // print(reviews)
+    let groupedReviews = {};
 
-    const groupedReviews = reviews.reduce((acc, review) => {
-        const { sentiment } = review;
-        acc[sentiment] = acc[sentiment] || [];
-        acc[sentiment].push(review);
-        return acc;
-    }, {});
+
+    reviews.forEach(currReview => {
+        let sentiment = currReview.sentiment;
+        console.log(currReview)
+        if (!groupedReviews[sentiment]) {
+            groupedReviews[sentiment] = [];
+        }
+        groupedReviews[sentiment].push(currReview);
+    });
+
+
+    // const groupedReviews = reviews.reduce((acc, review) => {
+    //     const { sentiment } = review;
+    //     acc[sentiment] = acc[sentiment] || [];
+    //     acc[sentiment].push(review);
+    //     return acc;
+    // }, {});
 
     console.log(groupedReviews);
 
 
-    return { userNow, item, itemCount, cartok, recommendation, reviews };
+    return { userNow, item, itemCount, cartok, recommendation, groupedReviews };
 }
 export const actions = {
     addtoCart: async ({ locals: { supabase, getSession } }) => {

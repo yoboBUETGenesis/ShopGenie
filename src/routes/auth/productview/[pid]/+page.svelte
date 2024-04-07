@@ -269,16 +269,64 @@
 				</div>
 				{#if isOpenReview}
 					<div class="text-[23px] ml-4 text-justify text-[#5a5a59]">
-						{#if groupedReviews}
+						{#if Object.keys(groupedReviews).length!==0}
 							<div class="flex justify-center items-center w-full">
 								<div class="h-[300px]">
 									<canvas bind:this={chartContainer}></canvas>
-								</div>
+								</div> 
 								<div>
-									<button on:click={checkReviews} class="px-4 m-4 py-2 border-[2px] border-black hover:scale-105">Check Reviews</button>
-									
+									{#if !showReview}
+									<button on:click={checkReviews} class="px-4 m-4 py-2 border-[2px] border-black hover:scale-105">Check Reviews</button>	
+									{:else}
+									<button on:click={closeReviews} class="px-4 m-4 py-2 border-[2px] border-black hover:scale-105">Close</button>	
+									{/if}
 								</div>
+								
 							</div>
+							{#if showReview}
+									<div class="bg-[#fcfcfc] my-2 p-4 border-[2px] border-black shadow-lg w-full dark:bg-[#212020] h-[300px] overflow-y-scroll scroll">
+										
+										<div class="">
+											<div class="m-4 border-b-[2px] border-black">
+												<p class="text-[26px] underline font-bold">Positive</p>
+												<ul>
+													{#if 'positive' in groupedReviews}
+														{#each groupedReviews.positive as review}
+															<li>
+																-{review.body}
+															</li>
+														{/each}
+													{/if}
+												</ul>
+											</div>
+											<div class="m-4 border-b-[2px] border-black">
+												<p class="text-[26px] underline font-bold">Negative</p>
+												<ul>
+													{#if 'negative' in groupedReviews}
+														{#each groupedReviews.negative as review}
+															<li>
+																-{review.body}
+															</li>
+														{/each}
+													{/if}
+												</ul>
+											</div>
+											<div class="m-4 ">
+												<p class="text-[26px] underline font-bold">Neutral</p>
+												<ul>
+													{#if 'neutral' in groupedReviews}
+														{#each groupedReviews.neutral as review}
+															<li>
+																-{review.body}
+															</li>
+														{/each}
+													{/if}
+												</ul>
+					
+											</div>
+										</div>
+									</div> 
+								{/if}
 						{:else}
 							<p>No reviews Yet</p>
 						{/if}
@@ -414,52 +462,7 @@
 			</div>
 		{/if}
 
-		{#if showReview}
-			<div
-				class="fixed inset-0 bg-white bg-opacity-50 w-full flex justify-center items-center z-50 transition-opacity "
-			>
-				<div class="bg-[#fcfcfc] p-4 border-[2px] border-black shadow-lg w-3/5 dark:bg-[#212020]">
-					<div class="flex w-full  justify-between items-center mb-3">
-						<h2 class="text-[32px] font-bold p-2 m-2">Reviews</h2>
-						<button class="text-[24px]" on:click={closeReviews}>&times;</button>
-					</div>
-
-					<div class="grid grid-cols-3">
-						<div class="m-4 border-r-[2px] border-black">
-							<p class="text-[26px] underline font-bold">Positive</p>
-							<ul>
-								{#each groupedReviews.positive as review}
-									<li>
-										{review.body}
-									</li>
-								{/each}
-							</ul>
-						</div>
-						<div class="m-4 border-r-[2px] border-black">
-							<p class="text-[26px] underline font-bold">Negative</p>
-							<ul>
-								{#each groupedReviews.negative as review}
-									<li>
-										{review.body}
-									</li>
-								{/each}
-							</ul>
-						</div>
-						<div class="m-4 ">
-							<p class="text-[26px] underline font-bold">Neutral</p>
-							<ul>
-								{#each groupedReviews.neutral as review}
-									<li>
-										{review.body}
-									</li>
-								{/each}
-							</ul>
-
-						</div>
-					</div>
-				</div>
-			</div>
-		{/if}
+		
 	</div>
 
 	<!-- related product -->

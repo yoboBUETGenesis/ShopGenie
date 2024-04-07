@@ -69,32 +69,7 @@ export const actions = {
         else throw redirect(303, '/auth/cart');
 
     },
-    upload: async ({ request, locals: { supabase, getSession } }) => {
-        const data = await request.formData();
-        //console.log("amar add class form holo", data);
 
-        let newClass = Object.fromEntries(data.entries()) as any;
-
-        const imageBuffer = await newClass.image.arrayBuffer();
-        const imageBase64 = Buffer.from(imageBuffer).toString('base64');
-
-        const apiResponse = await fetch('https://api.deepinfra.com/v1/models/clip-ViT-B-32:predict', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer wqaVWgdvOcN2Wi2Y4tsev6AkbWDJvqgJ',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                inputs: [{
-                    image: `data:image/jpeg;base64,${imageBase64}`,
-                }],
-                normalize: true,
-            }),
-        });
-
-        console.log(apiResponse);
-        // throw redirect(303, '/auth/query');
-    },
     audio: async ({ request, locals: { supabase, getSession } }) => {
         console.log("HERE")
         const formData = (await request.formData()) as any;

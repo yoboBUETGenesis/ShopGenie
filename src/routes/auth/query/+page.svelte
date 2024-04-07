@@ -1,4 +1,8 @@
 <script lang="ts">
+	import aarongimage from '$lib/images/Aarong Logo Vector.svg';
+
+	import allen from '$lib/images/Allen.svg';
+	import apex from '$lib/images/apex.png';
 	import genie from '$lib/images/genie.png';
 	import { enhance } from '$app/forms';
 	import Themeswitcher from '$lib/themeswitcher.svelte';
@@ -94,6 +98,11 @@
 	let textSearchResult = [];
 	let imageSearchResult = [];
 	let audioSearchResult = [];
+	let combined = [];
+	$: imageSearchResult;
+	$: audioSearchResult;
+	$: textSearchResult;
+	$: combined = [...imageSearchResult, ...audioSearchResult, ...textSearchResult];
 
 	async function textSubmit() {
 		// console.log(textquery);
@@ -153,9 +162,19 @@
 
 		const res = await ret.json();
 		recognizedSpeech = res['text'];
+		chunks = [];
 
 		console.log(recognizedSpeech);
-		chunks = [];
+
+		let payload = { text: recognizedSpeech };
+		const ret2 = await fetch('/api/summary-search', {
+			method: 'POST',
+			body: JSON.stringify(payload)
+		});
+		const res2 = await ret2.json();
+		audioSearchResult = res2['list'];
+
+		console.log(audioSearchResult);
 	}
 </script>
 
@@ -321,7 +340,7 @@
 					on:click={handleHearingStop}>Hearing Stop</button
 				>
 			{/if}
-			<div class="mt-9 flex flex-col items-center justify-center"></div>
+			<!-- <div class="mt-9 flex flex-col items-center justify-center"></div> -->
 			<button
 				type="submit"
 				class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
@@ -331,6 +350,127 @@
 		</form>
 	</div>
 </div>
+
+{#if textSearchResult.length > 0}
+	<section
+		id="Projects"
+		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+	>
+		{#each textSearchResult as item}
+			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+				<a href="/auth/productview/{item.id}">
+					<img
+						src={item.payload.Image_links[0]}
+						alt="Product"
+						class="h-80 w-72 object-top rounded-t-xl"
+					/>
+					<div class="px-4 py-3 w-72">
+						<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
+						<div class="flex flex-row space-x-3">
+							{#if item.payload.Company === 'Aarong'}
+								<img src={aarongimage} alt="" class="w-12 h-12" />
+							{:else if item.payload.Company === 'Allen Solly'}
+								<img src={allen} alt="" class="w-12 h-12" />
+							{:else}
+								<img src={apex} alt="" class="w-12 h-12" />
+							{/if}
+							<!-- <p class="font-semibold">{item.payload.Company}</p> -->
+						</div>
+						<p class="text-lg font-bold text-black truncate block capitalize">
+							{item.payload.Name}
+						</p>
+						<div class="flex items-center">
+							<p class="text-lg font-semibold text-black cursor-auto my-3">
+								{item.payload.Price}
+							</p>
+						</div>
+					</div>
+				</a>
+			</div>
+		{/each}
+		<!--   ✅ Product card 1 - Starts Here 👇 -->
+	</section>
+{/if}
+{#if imageSearchResult.length > 0}
+	<section
+		id="Projects"
+		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+	>
+		{#each imageSearchResult as item}
+			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+				<a href="/auth/productview/{item.id}">
+					<img
+						src={item.payload.Image_links[0]}
+						alt="Product"
+						class="h-80 w-72 object-top rounded-t-xl"
+					/>
+					<div class="px-4 py-3 w-72">
+						<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
+						<div class="flex flex-row space-x-3">
+							{#if item.payload.Company === 'Aarong'}
+								<img src={aarongimage} alt="" class="w-12 h-12" />
+							{:else if item.payload.Company === 'Allen Solly'}
+								<img src={allen} alt="" class="w-12 h-12" />
+							{:else}
+								<img src={apex} alt="" class="w-12 h-12" />
+							{/if}
+							<!-- <p class="font-semibold">{item.payload.Company}</p> -->
+						</div>
+						<p class="text-lg font-bold text-black truncate block capitalize">
+							{item.payload.Name}
+						</p>
+						<div class="flex items-center">
+							<p class="text-lg font-semibold text-black cursor-auto my-3">
+								{item.payload.Price}
+							</p>
+						</div>
+					</div>
+				</a>
+			</div>
+		{/each}
+		<!--   ✅ Product card 1 - Starts Here 👇 -->
+	</section>
+{/if}
+{#if audioSearchResult.length > 0}
+	<section
+		id="Projects"
+		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+	>
+		{#each audioSearchResult as item}
+			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+				<a href="/auth/productview/{item.id}">
+					<img
+						src={item.payload.Image_links[0]}
+						alt="Product"
+						class="h-80 w-72 object-top rounded-t-xl"
+					/>
+					<div class="px-4 py-3 w-72">
+						<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
+						<div class="flex flex-row space-x-3">
+							{#if item.payload.Company === 'Aarong'}
+								<img src={aarongimage} alt="" class="w-12 h-12" />
+							{:else if item.payload.Company === 'Allen Solly'}
+								<img src={allen} alt="" class="w-12 h-12" />
+							{:else}
+								<img src={apex} alt="" class="w-12 h-12" />
+							{/if}
+							<!-- <p class="font-semibold">{item.payload.Company}</p> -->
+						</div>
+						<p class="text-lg font-bold text-black truncate block capitalize">
+							{item.payload.Name}
+						</p>
+						<div class="flex items-center">
+							<p class="text-lg font-semibold text-black cursor-auto my-3">
+								{item.payload.Price}
+							</p>
+						</div>
+					</div>
+				</a>
+			</div>
+		{/each}
+		<!--   ✅ Product card 1 - Starts Here 👇 -->
+	</section>
+{/if}
 
 <style>
 	.links {

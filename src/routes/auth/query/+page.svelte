@@ -21,6 +21,7 @@
 		hearingRunning = false;
 	}
 	async function startRecording() {
+		chunks = [];
 		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 		mediaRecorder = new MediaRecorder(stream);
 
@@ -28,24 +29,24 @@
 			chunks.push(e.data);
 		};
 
-		mediaRecorder.onstop = async function () {
-			const blob = await new Blob(chunks, { type: 'audio/mp3' });
-			const recordedAudioFile = await new File([blob], 'recorded_audio.mp3', { type: 'audio/mp3' });
-			// console.log(recordedAudioFile)
+		// mediaRecorder.onstop = async function () {
+		// const blob = await new Blob(chunks, { type: 'audio/mp3' });
+		// const recordedAudioFile = await new File([blob], 'recorded_audio.mp3', { type: 'audio/mp3' });
+		// console.log(recordedAudioFile)
 
-			const formData = new FormData();
-			formData.append('audioFile', recordedAudioFile);
+		// const formData = new FormData();
+		// formData.append('audioFile', recordedAudioFile);
 
-			// const ret = await fetch('/api/transcribe', {
-			// 	method: 'POST',
-			// 	body: formData
-			// });
+		// const ret = await fetch('/api/transcribe', {
+		// 	method: 'POST',
+		// 	body: formData
+		// });
 
-			// const res = await ret.json();
-			// recognizedSpeech = res['text'];
+		// const res = await ret.json();
+		// recognizedSpeech = res['text'];
 
-			chunks = [];
-		};
+		// chunks = [];
+		// };
 
 		mediaRecorder.start();
 	}
@@ -92,6 +93,7 @@
 
 	let textSearchResult = [];
 	let imageSearchResult = [];
+	let audioSearchResult = [];
 
 	async function textSubmit() {
 		// console.log(textquery);
@@ -116,16 +118,16 @@
 
 	async function imageSubmit(event: Event) {
 		const formData = new FormData(event.target as HTMLFormElement);
-		let name = new Date() + ' ' + userNow.id;
-		name = await data.supabase.storage.from('imageqwery').upload(name, formData.get('image'), {
+		let name = Date.now() + '_' + userNow.id;
+		await data.supabase.storage.from('imageqwery').upload(name, formData.get('image'), {
 			cacheControl: '3600',
 			upsert: false
 		});
 
 		const { data: link } = await supabase.storage.from('imageqwery').getPublicUrl(name);
-		console.log(link.publicUrl);
+		// console.log(link.publicUrl);
 
-		// formData.get('image');
+		formData.append('imageLink', link.publicUrl);
 		const ret = await fetch('/api/image-search', {
 			method: 'POST',
 			body: formData
@@ -134,6 +136,26 @@
 		imageSearchResult = res['list'];
 
 		console.log(imageSearchResult);
+	}
+
+	async function audioSubmit() {
+		const blob = await new Blob(chunks, { type: 'audio/mp3' });
+		const recordedAudioFile = await new File([blob], 'recorded_audio.mp3', { type: 'audio/mp3' });
+		console.log(recordedAudioFile);
+
+		const formData = new FormData();
+		formData.append('audioFile', recordedAudioFile);
+
+		const ret = await fetch('/api/transcribe', {
+			method: 'POST',
+			body: formData
+		});
+
+		const res = await ret.json();
+		recognizedSpeech = res['text'];
+
+		console.log(recognizedSpeech);
+		chunks = [];
 	}
 </script>
 
@@ -272,40 +294,41 @@
 				</button>
 			</form>
 		</div>
-		{#if hearingRunning}
+		<form on:submit|preventDefault={audioSubmit}>
+			{#if hearingRunning}
+				<button
+					class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
+					disabled={true}
+					on:click={handleHearingStart}
+				>
+					Recording
+				</button>
+			{:else}
+				<button
+					class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
+					on:click={handleHearingStart}>Hearing Start</button
+				>
+			{/if}
+			{#if hearingRunning}
+				<button
+					class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
+					on:click={handleHearingStop}>Hearing Stop</button
+				>
+			{:else}
+				<button
+					class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
+					disabled
+					on:click={handleHearingStop}>Hearing Stop</button
+				>
+			{/if}
+			<div class="mt-9 flex flex-col items-center justify-center"></div>
 			<button
-				class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
-				disabled={true}
-				on:click={handleHearingStart}
+				type="submit"
+				class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
 			>
-				Recording
+				Submit
 			</button>
-		{:else}
-			<button
-				class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
-				on:click={handleHearingStart}>Hearing Start</button
-			>
-		{/if}
-		{#if hearingRunning}
-			<button
-				class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
-				on:click={handleHearingStop}>Hearing Stop</button
-			>
-		{:else}
-			<button
-				class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
-				disabled
-				on:click={handleHearingStop}>Hearing Stop</button
-			>
-		{/if}
-	</div>
-	<div class="mt-9 flex flex-col items-center justify-center">
-		<button
-			type="submit"
-			class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
-		>
-			Submit
-		</button>
+		</form>
 	</div>
 </div>
 

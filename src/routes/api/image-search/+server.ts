@@ -12,9 +12,17 @@ const client = new QdrantClient({
 const collectionName = "products";
 
 export const POST = (async ({ request }) => {
-    const data = await request.json()
-    const img_emd = data["image_embeddings"]
+    const formData = await request.formData();
+    console.log(formData.get("imageLink"))
 
+    const ret = await fetch('https://image-embed-server.onrender.com/image-embed', {
+		method: 'POST',
+		body: formData
+	});
+
+	const res = await ret.json();
+	const img_emd = res['image_embeddings'];
+    // console.log(img_emd)
     const list = await client.search(collectionName, {
         vector: {
             name: "image",

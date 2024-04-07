@@ -26,7 +26,6 @@ async function create_embedding(text: string) {
 }
 
 export const POST = (async ({ request }) => {
-	console.log("Ami Khujtesi", process.env.OPENAI_KEY_2);
 	const data = await request.json();
 	const text = data['text'];
 	// console.log(text)

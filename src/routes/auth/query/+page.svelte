@@ -95,56 +95,11 @@
 	// 	form?.success = "";
 	// }
 
-	let textSearchResult = [];
-	let imageSearchResult = [];
-	let audioSearchResult = [];
-	let combined = [];
+	let searchResult: any = []
 	let context = '';
 	let openAIresult = false;
-	let openAIList = [];
+	let openAIList: any = [];
 	let showOpenAIResults = false;
-
-	$: textSearchResult;
-	$: {
-		if (textSearchResult.length > 0) {
-			context = '';
-			for (let i = 0; i < textSearchResult.length; i++) {
-				context += 'id: ';
-				context += textSearchResult[i].id;
-				context += '. Summary: This is a ';
-				context +=
-					textSearchResult[i].payload.Category +
-					' from ' +
-					textSearchResult[i].payload.Company +
-					'. It is a ' +
-					textSearchResult[i].payload.Name +
-					'. ' +
-					textSearchResult[i].payload.Description;
-				context += '\n';
-			}
-			console.log(context);
-		}
-	}
-	$: {
-		if (audioSearchResult.length > 0) {
-			context = '';
-			for (let i = 0; i < audioSearchResult.length; i++) {
-				context += 'id: ';
-				context += audioSearchResult[i].id;
-				context += '. Summary: This is a ';
-				context +=
-					audioSearchResult[i].payload.Category +
-					' from ' +
-					audioSearchResult[i].payload.Company +
-					'. It is a ' +
-					audioSearchResult[i].payload.Name +
-					'. ' +
-					audioSearchResult[i].payload.Description;
-				context += '\n';
-			}
-			console.log(context);
-		}
-	}
 
 	async function textSubmit() {
 		// console.log(textquery);
@@ -162,23 +117,23 @@
 		const res = await ret.json();
 		console.log(res);
 
-		textSearchResult = res['list'];
+		searchResult = res['list'];
 
 		context = '';
-		for (let i = 0; i < textSearchResult.length; i++) {
+		for (let i = 0; i < searchResult.length; i++) {
 			context += 'id: ';
-			context += textSearchResult[i].id;
+			context += searchResult[i].id;
 			context += '. Summary: This is a ';
 			context +=
-				textSearchResult[i].payload.Category +
+				searchResult[i].payload.Category +
 				' from ' +
-				textSearchResult[i].payload.Company +
+				searchResult[i].payload.Company +
 				'. It is a ' +
-				textSearchResult[i].payload.Name +
+				searchResult[i].payload.Name +
 				'. ' +
-				textSearchResult[i].payload.Description +
+				searchResult[i].payload.Description +
 				'. Price' +
-				textSearchResult[i].payload.Price;
+				searchResult[i].payload.Price;
 			context += '\n';
 		}
 		console.log(context);
@@ -210,9 +165,9 @@
 		// console.log(res2['text']);
 		let tempo = [];
 		for (let i = 0; i < finlList.length; i++) {
-			for (let j = 0; j < textSearchResult.length; j++) {
-				if (textSearchResult[j].id == finlList[i]) {
-					tempo.push(textSearchResult[j]);
+			for (let j = 0; j < searchResult.length; j++) {
+				if (searchResult[j].id == finlList[i]) {
+					tempo.push(searchResult[j]);
 					break;
 				}
 			}
@@ -241,9 +196,65 @@
 			body: formData
 		});
 		const res = await ret.json();
-		imageSearchResult = res['list'];
+		searchResult = res['list'];
 
-		console.log(imageSearchResult);
+		console.log(searchResult);
+
+		context = '';
+		for (let i = 0; i < searchResult.length; i++) {
+			context += 'id: ';
+			context += searchResult[i].id;
+			context += '. Summary: This is a ';
+			context +=
+				searchResult[i].payload.Category +
+				' from ' +
+				searchResult[i].payload.Company +
+				'. It is a ' +
+				searchResult[i].payload.Name +
+				'. ' +
+				searchResult[i].payload.Description +
+				'. Price' +
+				searchResult[i].payload.Price;
+			context += '\n';
+		}
+		console.log(context);
+		let payload2 = { text: context, query: textquery };
+		// console.log(context)
+
+		const ret2 = await fetch('/api/sort-embed', {
+			method: 'POST',
+			body: JSON.stringify(payload2)
+		});
+
+		const res2 = await ret2.json();
+		console.log(res2['text']);
+		let strTmp = '';
+		let ok = false;
+		for (let i = 0; i < res2['text'].length; i++) {
+			if (res2['text'][i] == '[') {
+				ok = true;
+			} else if (res2['text'][i] == ']') {
+				strTmp += res2['text'][i];
+				ok = false;
+				break;
+			}
+			if (ok) {
+				strTmp += res2['text'][i];
+			}
+		}
+		const finlList = JSON.parse(strTmp);
+		// console.log(res2['text']);
+		let tempo = [];
+		for (let i = 0; i < finlList.length; i++) {
+			for (let j = 0; j < searchResult.length; j++) {
+				if (searchResult[j].id == finlList[i]) {
+					tempo.push(searchResult[j]);
+					break;
+				}
+			}
+		}
+		openAIList = tempo;
+		openAIresult = true;
 	}
 
 	async function audioSubmit() {
@@ -266,14 +277,70 @@
 		console.log(recognizedSpeech);
 
 		let payload = { text: recognizedSpeech };
-		const ret2 = await fetch('/api/summary-search', {
+		const ret11 = await fetch('/api/summary-search', {
 			method: 'POST',
 			body: JSON.stringify(payload)
 		});
-		const res2 = await ret2.json();
-		audioSearchResult = res2['list'];
+		const res11 = await ret11.json();
+		searchResult = res11['list'];
 
-		console.log(audioSearchResult);
+		console.log(searchResult);
+
+		context = '';
+		for (let i = 0; i < searchResult.length; i++) {
+			context += 'id: ';
+			context += searchResult[i].id;
+			context += '. Summary: This is a ';
+			context +=
+				searchResult[i].payload.Category +
+				' from ' +
+				searchResult[i].payload.Company +
+				'. It is a ' +
+				searchResult[i].payload.Name +
+				'. ' +
+				searchResult[i].payload.Description +
+				'. Price' +
+				searchResult[i].payload.Price;
+			context += '\n';
+		}
+		console.log(context);
+		let payload2 = { text: context, query: textquery };
+		// console.log(context)
+
+		const ret2 = await fetch('/api/sort-embed', {
+			method: 'POST',
+			body: JSON.stringify(payload2)
+		});
+
+		const res2 = await ret2.json();
+		console.log(res2['text']);
+		let strTmp = '';
+		let ok = false;
+		for (let i = 0; i < res2['text'].length; i++) {
+			if (res2['text'][i] == '[') {
+				ok = true;
+			} else if (res2['text'][i] == ']') {
+				strTmp += res2['text'][i];
+				ok = false;
+				break;
+			}
+			if (ok) {
+				strTmp += res2['text'][i];
+			}
+		}
+		const finlList = JSON.parse(strTmp);
+		// console.log(res2['text']);
+		let tempo = [];
+		for (let i = 0; i < finlList.length; i++) {
+			for (let j = 0; j < searchResult.length; j++) {
+				if (searchResult[j].id == finlList[i]) {
+					tempo.push(searchResult[j]);
+					break;
+				}
+			}
+		}
+		openAIList = tempo;
+		openAIresult = true;
 	}
 </script>
 
@@ -395,10 +462,10 @@
 			</form>
 		</div>
 		<div class="w-1/3">
-			<h1>Photo (optional)</h1>
+			<h1>Image </h1>
 			<form on:submit|preventDefault={imageSubmit} enctype="multipart/form-data">
 				<input
-					class="file-input w-full max-w-xs"
+					class="file-input w-full max-w-xs border border-slate-400"
 					type="file"
 					id="image"
 					name="image"
@@ -450,7 +517,7 @@
 	</div>
 </div>
 
-{#if textSearchResult.length > 0}
+{#if searchResult.length > 0}
 	{#if openAIresult}
 		<h1 class="font-bold ml-10">OpenAI Has Analysed. Here are the most Relevant search results</h1>
 	{:else}
@@ -514,7 +581,7 @@
 			id="Projects"
 			class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
 		>
-			{#each textSearchResult as item}
+			{#each searchResult as item}
 				<div
 					class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl"
 				>
@@ -549,118 +616,7 @@
 		</section>
 	{/if}
 {/if}
-{#if imageSearchResult.length > 0}
-	<section
-		id="Projects"
-		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
-	>
-		{#each imageSearchResult as item}
-			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-				<a href="/auth/productview/{item.id}">
-					<img
-						src={item.payload.Image_links[0]}
-						alt="Product"
-						class="h-80 w-72 object-top rounded-t-xl"
-					/>
-					<div class="px-4 py-3 w-72">
-						<div class="flex flex-row space-x-3">
-							{#if item.payload.Company === 'Aarong'}
-								<img src={aarongimage} alt="" class="w-12 h-12" />
-							{:else if item.payload.Company === 'Allen Solly'}
-								<img src={allen} alt="" class="w-12 h-12" />
-							{:else}
-								<img src={apex} alt="" class="w-12 h-12" />
-							{/if}
-						</div>
-						<p class="text-lg font-bold text-black truncate block capitalize">
-							{item.payload.Name}
-						</p>
-						<div class="flex items-center">
-							<p class="text-lg font-semibold text-black cursor-auto my-3">
-								{item.payload.Price}
-							</p>
-						</div>
-					</div>
-				</a>
-			</div>
-		{/each}
-	</section>
-{/if}
-{#if audioSearchResult.length > 0}
-	<section
-		id="Projects"
-		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
-	>
-		{#each audioSearchResult as item}
-			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-				<a href="/auth/productview/{item.id}">
-					<img
-						src={item.payload.Image_links[0]}
-						alt="Product"
-						class="h-80 w-72 object-top rounded-t-xl"
-					/>
-					<div class="px-4 py-3 w-72">
-						<div class="flex flex-row space-x-3">
-							{#if item.payload.Company === 'Aarong'}
-								<img src={aarongimage} alt="" class="w-12 h-12" />
-							{:else if item.payload.Company === 'Allen Solly'}
-								<img src={allen} alt="" class="w-12 h-12" />
-							{:else}
-								<img src={apex} alt="" class="w-12 h-12" />
-							{/if}
-						</div>
-						<p class="text-lg font-bold text-black truncate block capitalize">
-							{item.payload.Name}
-						</p>
-						<div class="flex items-center">
-							<p class="text-lg font-semibold text-black cursor-auto my-3">
-								{item.payload.Price}
-							</p>
-						</div>
-					</div>
-				</a>
-			</div>
-		{/each}
-	</section>
-{/if}
 
-{#if combined.length > 0}
-	<section
-		id="Projects"
-		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
-	>
-		{#each combined as item}
-			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-				<a href="/auth/productview/{item.id}">
-					<img
-						src={item.payload.Image_links[0]}
-						alt="Product"
-						class="h-80 w-72 object-top rounded-t-xl"
-					/>
-					<div class="px-4 py-3 w-72">
-						<div class="flex flex-row space-x-3">
-							{#if item.payload.Company === 'Aarong'}
-								<img src={aarongimage} alt="" class="w-12 h-12" />
-							{:else if item.payload.Company === 'Allen Solly'}
-								<img src={allen} alt="" class="w-12 h-12" />
-							{:else}
-								<img src={apex} alt="" class="w-12 h-12" />
-							{/if}
-						</div>
-						<p class="text-lg font-bold text-black truncate block capitalize">
-							{item.payload.Name}
-						</p>
-						<div class="flex items-center">
-							<p class="text-lg font-semibold text-black cursor-auto my-3">
-								{item.payload.Price}
-							</p>
-						</div>
-					</div>
-				</a>
-			</div>
-		{/each}
-	</section>
-{/if}
 
 <style>
 	.links {
@@ -682,4 +638,5 @@
 	.links a:hover {
 		color: #007bff; /* Accent color from Skeleton UI */
 	}
+	
 </style>

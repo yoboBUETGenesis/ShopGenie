@@ -136,7 +136,7 @@
 {#if !allproducts}
 	<div class="flex h-full w-full items-center justify-center">"Loading..."</div>
 {:else}
-	<h1 class="font-extrabold text-4xl text-center font-serif">New Arrival</h1>
+	<h1 class="font-extrabold text-4xl text-center font-serif">Western Outfit</h1>
 	<section
 		id="Projects"
 		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"

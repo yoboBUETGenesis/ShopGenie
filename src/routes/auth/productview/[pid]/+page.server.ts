@@ -57,12 +57,24 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
         .eq('uid', userNow.id)
         .eq('pid', productid)
 
-    // console.log(cartok, err2)
+    let recommendation = await client.recommend(collectionName, {
+        positive: [productid],
+        using: "summary",
+        params: {
+            ef: 128
+        },
+        strategy: "best_score",
+        limit: 3,
+        with_payload: true,
+        with_vector: false,
+    });
+
+    console.log(recommendation);
 
     // console.log(item)
 
 
-    return { userNow, item, itemCount, cartok };
+    return { userNow, item, itemCount, cartok, recommendation };
 }
 export const actions = {
     addtoCart: async ({ locals: { supabase, getSession } }) => {

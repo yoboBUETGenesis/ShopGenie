@@ -6,8 +6,8 @@
 	import Slider from '$lib/components/Slider.svelte';
 
 	export let data;
-	let { session, supabase, userNow, item, itemCount, cartok } = data;
-	$: ({ session, supabase, userNow, item, itemCount, cartok } = data);
+	let { session, supabase, userNow, item, itemCount, cartok, recommendation } = data;
+	$: ({ session, supabase, userNow, item, itemCount, cartok, recommendation } = data);
 	const handleSignOut = async () => {
 		await data.supabase.auth.signOut();
 		window.open('/login', '_self');
@@ -268,9 +268,67 @@
 
 	<!-- related product -->
 	<div>
-		<p class="text-[40px] mt-5">Related Products</p>
+		<p class="text-[40px] mt-5 ml-10">Related Products</p>
 
-		<!-- cart show -->
+		<section
+			id="Projects"
+			class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+		>
+			{#each recommendation as item}
+				<div
+					class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl"
+				>
+					<a href="/auth/productview/{item.id}">
+						<img
+							src={item.payload.Image_links[0]}
+							alt="Product"
+							class="h-80 w-72 object-cover rounded-t-xl"
+						/>
+						<div class="px-4 py-3 w-72">
+							<span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span>
+							<p class="text-lg font-bold text-black truncate block capitalize">
+								{item.payload.Name}
+							</p>
+							<div class="flex items-center">
+								<p class="text-lg font-semibold text-black cursor-auto my-3">
+									{item.payload.Price}
+								</p>
+							</div>
+						</div>
+					</a>
+					<form
+						action="?/deleteCartItem&id={item.id}"
+						method="POST"
+						class="flex flex-col items-center justify-center mb-2"
+					>
+						<button type="submit">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="20"
+								height="20"
+								fill="currentColor"
+								class="bi bi-trash"
+								viewBox="0 0 16 16"
+								data-toggle="tooltip"
+								data-placement="top"
+								style="transition: transform 0.3s"
+								onmouseover="this.style.transform = 'rotate(360deg)'"
+								onmouseout="this.style.transform = 'rotate(0deg)'"
+							>
+								<path
+									d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"
+								/>
+								<path
+									fill-rule="evenodd"
+									d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+								/>
+							</svg>
+						</button>
+					</form>
+				</div>
+			{/each}
+			<!--   ✅ Product card 1 - Starts Here 👇 -->
+		</section>
 	</div>
 </div>
 <pre>{JSON.stringify(item, null, 2)}</pre>

@@ -130,8 +130,9 @@
 					{/if}
 					<!-- <p class="font-extrabold text-xl mt-1">{item.payload.Company}</p> -->
 				</div>
-
-				<p class="text-[70px] leading-0 font-bold leading-tight">{item.payload.Name}</p>
+				<a href={item.payload.Link}>
+					<p class="text-[70px] leading-0 font-bold leading-tight">{item.payload.Name}</p>
+				</a>
 				<p>
 					<span class="font-semibold">Category &gt</span>
 					<span class="font-light">{item.payload.Category}</span>

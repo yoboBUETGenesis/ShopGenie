@@ -61,7 +61,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });
@@ -76,7 +76,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });
@@ -91,7 +91,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });
@@ -106,7 +106,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });
@@ -121,7 +121,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });
@@ -136,7 +136,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });
@@ -151,7 +151,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });
@@ -171,7 +171,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });
@@ -187,7 +187,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
                 },
             ],
         },
-        limit: 4,
+        limit: 3,
         with_payload: true,
         with_vector: false,
     });

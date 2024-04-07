@@ -11,6 +11,7 @@
 	import femaleModel from '$lib/images/femaleModel.jpeg';
 	import maleModel from '$lib/images/maleModel.jpg';
 	import boyModel from '$lib/images/boyModel.jpg';
+	import girlModel from '$lib/images/girlModel.jpeg'
 	import { onMount } from 'svelte';
 
 	import Themeswitcher from '$lib/themeswitcher.svelte';
@@ -60,7 +61,7 @@
 </script>
 
 <div>
-	<nav class="p-4">
+	<nav class="fixed w-full top-0">
 		<div class="navbar bg-base-100">
 			<div class="flex-1">
 				<div class="flex-1">
@@ -152,7 +153,7 @@
 		</div>
 	</nav>
 
-	<section class="flex flex-col items-center justify-center space-x-8 mt-6">
+	<section class="md:pt-[100px] flex flex-col items-center justify-center space-x-8 mt-6">
 		<h1 class="font-extrabold text-3xl font-serif">
 			Stay with Us!! The Largest fashion Collection at your hand
 		</h1>
@@ -199,73 +200,83 @@
 		</div>
 	</section>
 
-	<div class="flex flex-col items-center justify-center mt-10">
-		<h1 class="font-extrabold text-2xl">Recommended for You</h1>
-	</div>
+	
 
-	<section
-		id="Projects"
-		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
-	>
-		{#each items as item}
-			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-				<a href="/auth/productview/{item.id}">
-					<img
-						src={item.payload.Image_links[0]}
-						alt="Product"
-						class="h-80 w-72 object-top rounded-t-xl"
-					/>
-					<div class="px-4 py-3 w-72">
-						<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
-						<div class="flex flex-row space-x-3">
-							{#if item.payload.Company === 'Aarong'}
-								<img src={aarongimage} alt="" class="w-12 h-12" />
-							{:else if item.payload.Company === 'Allen Solly'}
-								<img src={allen} alt="" class="w-12 h-12" />
-							{:else}
-								<img src={apex} alt="" class="w-12 h-12" />
-							{/if}
-							<!-- <p class="font-semibold">{item.payload.Company}</p> -->
-						</div>
-						<p class="text-lg font-bold text-black truncate block capitalize">
-							{item.payload.Name}
-						</p>
-						<div class="flex items-center">
-							<p class="text-lg font-semibold text-black cursor-auto my-3">{item.payload.Price}</p>
-						</div>
+	<div class="w-full flex">
+		<div class="w-1/5 md:flex justify-center ">
+			<div class="w-full m-3">
+				<div class="grid grid-rows-4  md:sticky top-[330px]">
+					<div class="h-[80px] border-[2px] flex items-center">
+						<a href="/auth/products/men">
+							<img src={maleModel} alt="" class="h-[80px] w-[60px]" />
+						</a>
+						<p class="px-2 font-bold text-[22px]">Men</p>
 					</div>
-				</a>
-			</div>
-		{/each}
-		<!--   ✅ Product card 1 - Starts Here 👇 -->
-	</section>
-
-	<!-- <div class="w-full md:flex justify-center items-center md:h-[calc(100vh-150px)]">
-		<div class="w-3/4">
-			<div class="grid grid-cols-4 gap-3 h-[60vh]">
-				<div class="h-full border-[2px]">
-					<a href="/auth/products/men">
-						<img src={maleModel} alt="" class="h-full" />
-					</a>
-				</div>
-				<div class="h-full border-[2px]">
-					<a href="/auth/products/kids/boy">
-						<img src={femaleModel} alt="" class="h-full" />
-					</a>
-				</div>
-				<div class="h-full border-[2px]">
-					<a href="/auth/products/kids/boy">
-						<img src={boyModel} alt="" class="h-full" />
-					</a>
-				</div>
-				<div class="h-full border-[2px]">
-					<a href="/auth/products/kids/girl">
-						<img src={boyModel} alt="" class="h-full" />
-					</a>
+					<div class="h-[80px] border-[2px] flex items-center">
+						<a href="/auth/products/kids/boy">
+							<img src={femaleModel} alt="" class="h-[80px] w-[60px]" />
+						</a>
+						<p class="px-2 font-bold text-[22px]">Women</p>
+					</div>
+					<div class="h-[80px] border-[2px] flex items-center">
+						<a href="/auth/products/kids/boy">
+							<img src={boyModel} alt="" class="h-[80px] w-[60px]" />
+						</a>
+						<p class="px-2 font-bold text-[22px]">Boy</p>
+					</div>
+					<div class="h-[80px] border-[2px] flex items-center">
+						<a href="/auth/products/kids/girl">
+							<img src={girlModel} alt="" class="h-[80px] w-[60px]" />
+						</a>
+						<p class="px-2 font-bold text-[22px]">Girl</p>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div> -->
+	
+		<div class="w-4/5">
+			<div class="flex flex-col items-center justify-center mt-10">
+				<h1 class="font-extrabold text-2xl">Recommended for You</h1>
+			</div>
+			<section
+				id="Projects"
+				class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+			>
+				{#each items as item}
+					<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+						<a href="/auth/productview/{item.id}">
+							<img
+								src={item.payload.Image_links[0]}
+								alt="Product"
+								class="h-80 w-72 object-top rounded-t-xl"
+							/>
+							<div class="px-4 py-3 w-72">
+								<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
+								<div class="flex flex-row space-x-3">
+									{#if item.payload.Company === 'Aarong'}
+										<img src={aarongimage} alt="" class="w-12 h-12" />
+									{:else if item.payload.Company === 'Allen Solly'}
+										<img src={allen} alt="" class="w-12 h-12" />
+									{:else}
+										<img src={apex} alt="" class="w-12 h-12" />
+									{/if}
+									<!-- <p class="font-semibold">{item.payload.Company}</p> -->
+								</div>
+								<p class="text-lg font-bold text-black truncate block capitalize">
+									{item.payload.Name}
+								</p>
+								<div class="flex items-center">
+									<p class="text-lg font-semibold text-black cursor-auto my-3">{item.payload.Price}</p>
+								</div>
+							</div>
+						</a>
+					</div>
+				{/each}
+				<!--   ✅ Product card 1 - Starts Here 👇 -->
+			</section>
+		</div>
+	</div>
+
 	<ShortFooter />
 </div>
 

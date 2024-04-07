@@ -5,7 +5,7 @@
 	import saveTime from '$lib/images/saveTime.gif';
 	import voice from '$lib/images/voice.gif';
 	import click from '$lib/images/click.gif';
-	import scrap from '$lib/images/scrapping.gif'
+	import scrap from '$lib/images/scrapping.gif';
 	import genie from '$lib/images/genie.png';
 
 	import { writable } from 'svelte/store';
@@ -83,7 +83,9 @@
 					tabindex="0"
 					class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
 				>
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<li on:click={handleClick}><a href="/">Find</a></li>
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<li on:click={handleClick}><a href="/login">Get Started</a></li>
 				</ul>
 			</div>
@@ -91,7 +93,7 @@
 			<div>
 				<div class="flex items-center justify-between px-4 mr-5 font-bold text-[22px]">
 					<div class="flex space-x-4">
-						<a href="/" class=" hover:text-[#1a1919] hover:scale-105">Find</a>
+						<a href="/about" class=" hover:text-[#1a1919] hover:scale-105">About</a>
 
 						<a href="/login" class=" hover:text-[#1d1d1d] hover:scale-105">Get Started</a>
 					</div>
@@ -176,15 +178,16 @@
 					<p class="text-[40px] text-white font-thin leading-[1px]"></p>
 					<p class="md:text-[80px] text-[60px] text-white font-bold leading-tight">Image & Voice Based Search<p>
 					<p class="text-[24px] text-white w-3/4">
-						Why typing when you can use your voice? or simply click which you want to find out from our huge collection?
+						Why typing when you can use your voice? or simply click which you want to find out from
+						our huge collection?
 					</p>
 				</div>
 			</div>
 		</div>
 		
 	</div>
-	
-	<Footer/>
+
+	<Footer />
 </div>
 
 <style>
@@ -199,8 +202,6 @@
 	.animated-element {
 		animation: slideIn 1.5s ease-in-out forwards;
 	}
-		
-		
 
 	@keyframes welcome {
 		0% {

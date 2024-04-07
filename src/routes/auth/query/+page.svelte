@@ -102,6 +102,7 @@
 	let context = '';
 	let openAIresult = false;
 	let openAIList = [];
+	let showOpenAIResults = false;
 
 	$: textSearchResult;
 	$: {
@@ -437,42 +438,98 @@
 	{:else}
 		<h1 class="font-bold ml-10">Showing result fetched from Qdrant. OpenAI analysing..</h1>
 	{/if}
-
-	<section
-		id="Projects"
-		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
-	>
-		{#each textSearchResult as item}
-			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-				<a href="/auth/productview/{item.id}">
-					<img
-						src={item.payload.Image_links[0]}
-						alt="Product"
-						class="h-80 w-72 object-top rounded-t-xl"
-					/>
-					<div class="px-4 py-3 w-72">
-						<div class="flex flex-row space-x-3">
-							{#if item.payload.Company === 'Aarong'}
-								<img src={aarongimage} alt="" class="w-12 h-12" />
-							{:else if item.payload.Company === 'Allen Solly'}
-								<img src={allen} alt="" class="w-12 h-12" />
-							{:else}
-								<img src={apex} alt="" class="w-12 h-12" />
-							{/if}
-						</div>
-						<p class="text-lg font-bold text-black truncate block capitalize">
-							{item.payload.Name}
-						</p>
-						<div class="flex items-center">
-							<p class="text-lg font-semibold text-black cursor-auto my-3">
-								{item.payload.Price}
-							</p>
-						</div>
+	<div class="toggle-container ml-10 mt-10">
+		<button on:click={() => (showOpenAIResults = !showOpenAIResults)} class="btn">
+			{#if showOpenAIResults}
+				Show Text Results
+			{:else}
+				Show OpenAI Results
+			{/if}
+		</button>
+	</div>
+	{#if showOpenAIResults}
+		<!-- Display OpenAI Results -->
+		{#if openAIresult}
+			<section
+				id="Projects"
+				class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+			>
+				{#each openAIList as item}
+					<div
+						class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl"
+					>
+						<a href="/auth/productview/{item.id}">
+							<img
+								src={item.payload.Image_links[0]}
+								alt="Product"
+								class="h-80 w-72 object-top rounded-t-xl"
+							/>
+							<div class="px-4 py-3 w-72">
+								<div class="flex flex-row space-x-3">
+									{#if item.payload.Company === 'Aarong'}
+										<img src={aarongimage} alt="" class="w-12 h-12" />
+									{:else if item.payload.Company === 'Allen Solly'}
+										<img src={allen} alt="" class="w-12 h-12" />
+									{:else}
+										<img src={apex} alt="" class="w-12 h-12" />
+									{/if}
+								</div>
+								<p class="text-lg font-bold text-black truncate block capitalize">
+									{item.payload.Name}
+								</p>
+								<div class="flex items-center">
+									<p class="text-lg font-semibold text-black cursor-auto my-3">
+										{item.payload.Price}
+									</p>
+								</div>
+							</div>
+						</a>
 					</div>
-				</a>
-			</div>
-		{/each}
-	</section>
+				{/each}
+			</section>
+		{:else}
+			<h1>Result not yet fetched</h1>
+		{/if}
+	{:else}
+		<!-- Display Text Search Results -->
+		<section
+			id="Projects"
+			class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+		>
+			{#each textSearchResult as item}
+				<div
+					class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl"
+				>
+					<a href="/auth/productview/{item.id}">
+						<img
+							src={item.payload.Image_links[0]}
+							alt="Product"
+							class="h-80 w-72 object-top rounded-t-xl"
+						/>
+						<div class="px-4 py-3 w-72">
+							<div class="flex flex-row space-x-3">
+								{#if item.payload.Company === 'Aarong'}
+									<img src={aarongimage} alt="" class="w-12 h-12" />
+								{:else if item.payload.Company === 'Allen Solly'}
+									<img src={allen} alt="" class="w-12 h-12" />
+								{:else}
+									<img src={apex} alt="" class="w-12 h-12" />
+								{/if}
+							</div>
+							<p class="text-lg font-bold text-black truncate block capitalize">
+								{item.payload.Name}
+							</p>
+							<div class="flex items-center">
+								<p class="text-lg font-semibold text-black cursor-auto my-3">
+									{item.payload.Price}
+								</p>
+							</div>
+						</div>
+					</a>
+				</div>
+			{/each}
+		</section>
+	{/if}
 {/if}
 {#if imageSearchResult.length > 0}
 	<section

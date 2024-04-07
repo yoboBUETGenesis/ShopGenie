@@ -18,7 +18,7 @@ const openai = new OpenAI({
 });
 
 async function create_embedding(query: string, combined_result: String) {
-    const prompt = "The original query was: " + query + ". Vector database returned the following products\n" + combined_result + "\nReturn  a list of ids if the corresponding item relevant to the query. Only return the list. Not a single additional token. Make sure the list size is strictly less than 10. Ensure that the list is ordered based on the degree of similarity.For Example: a result can be like this: [5, 0, 6, 8, 10, 12, 2, 5, 4]. The list size can be anything less than 10. But you MUST return a list of IDs of the most relevant products for the query";
+    const prompt = "The original query was: " + query + ". Vector database returned the following products\n" + combined_result + "\nReturn  a list of ids if the corresponding item relevant to the query. Only return the list. You MUST return the list only and Not a single additional token. Make sure the list size is strictly less than 10. Ensure that the list is ordered based on the degree of similarity. For Example: a result can be like this: [5, 0, 6, 8, 10, 12, 2, 5, 4]. you MUST return only the list and nothing else";
     // const response = await openai
     //     .completions.create({
     //         model: "gpt-3.5-turbo-0125",
@@ -71,21 +71,31 @@ async function create_embedding(query: string, combined_result: String) {
 
     // console.log(chatResponse.body);
 
-    const response = await openai
-        .completions.create({
-            model: "gpt-3.5-turbo-instruct",
-            prompt: prompt,
-            temperature: 0.3,
-            max_tokens: 200,
-            top_p: 1,
-            frequency_penalty: 0.5,
-            presence_penalty: 0,
-        });
-    // console.log(response)
-    // const sentiment = response.choices[0].text;
+    // const response = await openai
+    //     .completions.create({
+    //         model: "gpt-3.5-turbo-instruct",
+    //         prompt: prompt,
+    //         temperature: 0.3,
+    //         max_tokens: 200,
+    //         top_p: 1,
+    //         frequency_penalty: 0.5,
+    //         presence_penalty: 0,
+    //     });
+    // // console.log(response)
+    // // const sentiment = response.choices[0].text;
 
 
-    // console.log("Backend: ", response.choices[0].text);
+    // // console.log("Backend: ", response.choices[0].text);
+    // return response.choices[0].text;
+    const response = await openai.completions.create({
+        model: "gpt-4-1106-preview", // Specify the model here
+        prompt: prompt,
+        temperature: 0.2, // Adjust as needed for your use case
+        max_tokens: 200,
+        top_p: 1,
+        frequency_penalty: 0.5,
+        presence_penalty: 0,
+    });
     return response.choices[0].text;
 }
 

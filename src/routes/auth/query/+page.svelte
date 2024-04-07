@@ -192,7 +192,21 @@
 
 		const res2 = await ret2.json();
 		console.log(res2['text']);
-		const finlList = JSON.parse(res2['text']);
+		let strTmp = '';
+		let ok = false;
+		for (let i = 0; i < res2['text'].length; i++) {
+			if (res2['text'][i] == '[') {
+				ok = true;
+			} else if (res2['text'][i] == ']') {
+				strTmp += res2['text'][i];
+				ok = false;
+				break;
+			}
+			if (ok) {
+				strTmp += res2['text'][i];
+			}
+		}
+		const finlList = JSON.parse(strTmp);
 		// console.log(res2['text']);
 		let tempo = [];
 		for (let i = 0; i < finlList.length; i++) {

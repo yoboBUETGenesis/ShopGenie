@@ -11,7 +11,7 @@
 	import femaleModel from '$lib/images/femaleModel.jpeg';
 	import maleModel from '$lib/images/maleModel.jpg';
 	import boyModel from '$lib/images/boyModel.jpg';
-	import girlModel from '$lib/images/girlModel.jpeg'
+	import girlModel from '$lib/images/girlModel.jpeg';
 	import { onMount } from 'svelte';
 
 	import Themeswitcher from '$lib/themeswitcher.svelte';
@@ -99,7 +99,7 @@
 				</ul>
 				<div class="dropdown dropdown-end ml-5">
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<div tabindex="0" role="button" class="btn btn-ghost btn-circle " on:click={gotocart}>
+					<div tabindex="0" role="button" class="btn btn-ghost btn-circle" on:click={gotocart}>
 						<div class="indicator">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -200,47 +200,41 @@
 		</div>
 	</section>
 
-	
-
 	<div class="w-full flex">
-		<div class="w-1/5 md:flex justify-center ">
+		<div class="w-1/5 md:flex justify-center">
 			<div class="w-full m-3 pl-4">
-				<div class="grid grid-rows-4  md:sticky top-[350px] space-y-[.5px]">
+				<div class="grid grid-rows-4 md:sticky top-[300px] space-y-[.5px]">
 					<a href="/auth/products/men" class="cursor-pointer hover:scale-105">
-
 						<div class="h-[100px] border-[2px] flex items-center">
-								<img src={maleModel} alt="" class="h-[100px] w-[80px]" />
-							
+							<img src={maleModel} alt="" class="h-[100px] w-[80px]" />
+
 							<p class="px-2 text-[22px]">Men</p>
 						</div>
 					</a>
 					<a href="/auth/products/women" class="cursor-pointer hover:scale-105">
 						<div class="h-[100px] border-[2px] flex items-center">
-							
-								<img src={femaleModel} alt="" class="h-[100px] w-[80px]" />
-							<p class="px-2  text-[22px]">Women</p>
+							<img src={femaleModel} alt="" class="h-[100px] w-[80px]" />
+							<p class="px-2 text-[22px]">Women</p>
 						</div>
 					</a>
 					<a href="/auth/products/kids/boy" class="cursor-pointer hover:scale-105">
 						<div class="h-[100px] border-[2px] flex items-center">
-							
-								<img src={boyModel} alt="" class="h-[100px] w-[80px]" />
-							
-							<p class="px-2  text-[22px]">Boy</p>
+							<img src={boyModel} alt="" class="h-[100px] w-[80px]" />
+
+							<p class="px-2 text-[22px]">Boy</p>
 						</div>
 					</a>
 					<a href="/auth/products/kids/girl" class="cursor-pointer hover:scale-105">
 						<div class="h-[100px] border-[2px] flex items-center">
-							
-								<img src={girlModel} alt="" class="h-[100px] w-[80px]" />
-							
-							<p class="px-2  text-[22px]">Girl</p>
+							<img src={girlModel} alt="" class="h-[100px] w-[80px]" />
+
+							<p class="px-2 text-[22px]">Girl</p>
 						</div>
 					</a>
 				</div>
 			</div>
 		</div>
-	
+
 		<div class="w-4/5 border-l-[1px]">
 			<div class="flex flex-col items-center justify-center mt-10">
 				<h1 class="font-extrabold text-2xl">Recommended for You</h1>
@@ -250,7 +244,9 @@
 				class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
 			>
 				{#each items as item}
-					<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+					<div
+						class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl"
+					>
 						<a href="/auth/productview/{item.id}">
 							<img
 								src={item.payload.Image_links[0]}
@@ -273,7 +269,9 @@
 									{item.payload.Name}
 								</p>
 								<div class="flex items-center">
-									<p class="text-lg font-semibold text-black cursor-auto my-3">{item.payload.Price}</p>
+									<p class="text-lg font-semibold text-black cursor-auto my-3">
+										{item.payload.Price}
+									</p>
 								</div>
 							</div>
 						</a>

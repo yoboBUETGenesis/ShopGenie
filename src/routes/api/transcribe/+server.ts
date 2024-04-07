@@ -5,7 +5,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 dotenv.config();
 
 const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY || ''
+	apiKey: process.env.OPENAI_KEY_2 || ''
 });
 
 //Expection form-data with "audioFile"

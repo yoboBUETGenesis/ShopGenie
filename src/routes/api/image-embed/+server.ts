@@ -1,12 +1,10 @@
-import * as dotenv from 'dotenv';
-import { QdrantClient } from '@qdrant/js-client-rest';
 import type { RequestHandler } from '@sveltejs/kit';
 
 //Expection form-data with "image"
 export const POST = (async ({ request }) => {
 	const formData = await request.formData();
 
-	const ret = await fetch('http://localhost:8080/image-embed', {
+	const ret = await fetch('https://image-embed-server.onrender.com/image-embed', {
 		method: 'POST',
 		body: formData
 	});

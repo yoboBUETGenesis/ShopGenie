@@ -37,6 +37,9 @@ export const POST = (async ({ request }) => {
 			name: 'summary',
 			vector: emd
 		},
+		params: {
+			ef: 128
+		},
 		limit: 20,
 		with_payload: true,
 		with_vector: false

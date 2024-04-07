@@ -99,14 +99,56 @@
 	let imageSearchResult = [];
 	let audioSearchResult = [];
 	let combined = [];
-	$: imageSearchResult;
-	$: audioSearchResult;
+	let context = '';
+	let openAIresult = false;
+	let openAIList = [];
+
 	$: textSearchResult;
-	$: combined = [...imageSearchResult, ...audioSearchResult, ...textSearchResult];
+	$: {
+		if (textSearchResult.length > 0) {
+			context = '';
+			for (let i = 0; i < textSearchResult.length; i++) {
+				context += 'id: ';
+				context += textSearchResult[i].id;
+				context += '. Summary: This is a ';
+				context +=
+					textSearchResult[i].payload.Category +
+					' from ' +
+					textSearchResult[i].payload.Company +
+					'. It is a ' +
+					textSearchResult[i].payload.Name +
+					'. ' +
+					textSearchResult[i].payload.Description;
+				context += '\n';
+			}
+			console.log(context);
+		}
+	}
+	$: {
+		if (audioSearchResult.length > 0) {
+			context = '';
+			for (let i = 0; i < audioSearchResult.length; i++) {
+				context += 'id: ';
+				context += audioSearchResult[i].id;
+				context += '. Summary: This is a ';
+				context +=
+					audioSearchResult[i].payload.Category +
+					' from ' +
+					audioSearchResult[i].payload.Company +
+					'. It is a ' +
+					audioSearchResult[i].payload.Name +
+					'. ' +
+					audioSearchResult[i].payload.Description;
+				context += '\n';
+			}
+			console.log(context);
+		}
+	}
 
 	async function textSubmit() {
 		// console.log(textquery);
 		let payload = { text: textquery };
+		openAIresult = false;
 		// console.log(payload)
 
 		// console.log("Here")
@@ -117,10 +159,48 @@
 		// console.log(ret)
 
 		const res = await ret.json();
-		// console.log(res)
+		console.log(res);
 		textSearchResult = res['list'];
 
-		// console.log(textSearchResult)
+		context = '';
+		for (let i = 0; i < textSearchResult.length; i++) {
+			context += 'id: ';
+			context += textSearchResult[i].id;
+			context += '. Summary: This is a ';
+			context +=
+				textSearchResult[i].payload.Category +
+				' from ' +
+				textSearchResult[i].payload.Company +
+				'. It is a ' +
+				textSearchResult[i].payload.Name +
+				'. ' +
+				textSearchResult[i].payload.Description;
+			context += '\n';
+		}
+		console.log(context);
+		let payload2 = { text: context, query: textquery };
+		// console.log(context)
+
+		const ret2 = await fetch('/api/sort-embed', {
+			method: 'POST',
+			body: JSON.stringify(payload2)
+		});
+
+		const res2 = await ret2.json();
+		const finlList = JSON.parse(res2['text']);
+		// console.log(res2['text']);
+		let tempo = [];
+		for (let i = 0; i < finlList.length; i++) {
+			for (let j = 0; j < textSearchResult.length; j++) {
+				if (textSearchResult[j].id == finlList[i]) {
+					tempo.push(textSearchResult[j]);
+					break;
+				}
+			}
+		}
+		openAIList = tempo;
+		openAIresult = true;
+
 		// console.log("Here")
 		textquery = '';
 	}
@@ -352,6 +432,12 @@
 </div>
 
 {#if textSearchResult.length > 0}
+	{#if openAIresult}
+		<h1 class="font-bold ml-10">OpenAI Has Analysed. Here are the most Relevant search results</h1>
+	{:else}
+		<h1 class="font-bold ml-10">Showing result fetched from Qdrant. OpenAI analysing..</h1>
+	{/if}
+
 	<section
 		id="Projects"
 		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
@@ -365,7 +451,6 @@
 						class="h-80 w-72 object-top rounded-t-xl"
 					/>
 					<div class="px-4 py-3 w-72">
-						<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
 						<div class="flex flex-row space-x-3">
 							{#if item.payload.Company === 'Aarong'}
 								<img src={aarongimage} alt="" class="w-12 h-12" />
@@ -374,7 +459,6 @@
 							{:else}
 								<img src={apex} alt="" class="w-12 h-12" />
 							{/if}
-							<!-- <p class="font-semibold">{item.payload.Company}</p> -->
 						</div>
 						<p class="text-lg font-bold text-black truncate block capitalize">
 							{item.payload.Name}
@@ -388,7 +472,6 @@
 				</a>
 			</div>
 		{/each}
-		<!--   ✅ Product card 1 - Starts Here 👇 -->
 	</section>
 {/if}
 {#if imageSearchResult.length > 0}
@@ -405,7 +488,6 @@
 						class="h-80 w-72 object-top rounded-t-xl"
 					/>
 					<div class="px-4 py-3 w-72">
-						<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
 						<div class="flex flex-row space-x-3">
 							{#if item.payload.Company === 'Aarong'}
 								<img src={aarongimage} alt="" class="w-12 h-12" />
@@ -414,7 +496,6 @@
 							{:else}
 								<img src={apex} alt="" class="w-12 h-12" />
 							{/if}
-							<!-- <p class="font-semibold">{item.payload.Company}</p> -->
 						</div>
 						<p class="text-lg font-bold text-black truncate block capitalize">
 							{item.payload.Name}
@@ -428,7 +509,6 @@
 				</a>
 			</div>
 		{/each}
-		<!--   ✅ Product card 1 - Starts Here 👇 -->
 	</section>
 {/if}
 {#if audioSearchResult.length > 0}
@@ -445,7 +525,6 @@
 						class="h-80 w-72 object-top rounded-t-xl"
 					/>
 					<div class="px-4 py-3 w-72">
-						<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
 						<div class="flex flex-row space-x-3">
 							{#if item.payload.Company === 'Aarong'}
 								<img src={aarongimage} alt="" class="w-12 h-12" />
@@ -454,7 +533,6 @@
 							{:else}
 								<img src={apex} alt="" class="w-12 h-12" />
 							{/if}
-							<!-- <p class="font-semibold">{item.payload.Company}</p> -->
 						</div>
 						<p class="text-lg font-bold text-black truncate block capitalize">
 							{item.payload.Name}
@@ -468,7 +546,44 @@
 				</a>
 			</div>
 		{/each}
-		<!--   ✅ Product card 1 - Starts Here 👇 -->
+	</section>
+{/if}
+
+{#if combined.length > 0}
+	<section
+		id="Projects"
+		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+	>
+		{#each combined as item}
+			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+				<a href="/auth/productview/{item.id}">
+					<img
+						src={item.payload.Image_links[0]}
+						alt="Product"
+						class="h-80 w-72 object-top rounded-t-xl"
+					/>
+					<div class="px-4 py-3 w-72">
+						<div class="flex flex-row space-x-3">
+							{#if item.payload.Company === 'Aarong'}
+								<img src={aarongimage} alt="" class="w-12 h-12" />
+							{:else if item.payload.Company === 'Allen Solly'}
+								<img src={allen} alt="" class="w-12 h-12" />
+							{:else}
+								<img src={apex} alt="" class="w-12 h-12" />
+							{/if}
+						</div>
+						<p class="text-lg font-bold text-black truncate block capitalize">
+							{item.payload.Name}
+						</p>
+						<div class="flex items-center">
+							<p class="text-lg font-semibold text-black cursor-auto my-3">
+								{item.payload.Price}
+							</p>
+						</div>
+					</div>
+				</a>
+			</div>
+		{/each}
 	</section>
 {/if}
 

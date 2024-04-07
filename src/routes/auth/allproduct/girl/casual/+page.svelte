@@ -74,13 +74,13 @@
 					>
 				</li>
 				<li>
-					<a href="/auth/reviews" class="flex items-center p-1 font-bold"
+					<a href="/auth/home" class="flex items-center p-1 font-bold"
 						><img
-							src="https://dxpcgmtdvyvcxbaffqmt.supabase.co/storage/v1/object/public/demo/review-svgrepo-com.svg"
+							src="https://dxpcgmtdvyvcxbaffqmt.supabase.co/storage/v1/object/public/demo/home-house-svgrepo-com.svg"
 							alt="Dashboard Icon"
 							class="h-7 mr-1 hover:rotate-12"
 						/>
-						Reviews</a
+						Home</a
 					>
 				</li>
 			</ul>

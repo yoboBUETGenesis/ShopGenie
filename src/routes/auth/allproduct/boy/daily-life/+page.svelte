@@ -40,12 +40,10 @@
 		window.open('/auth/cart', '_self');
 	}
 
-	const boyAll = ["daily-life" ,"formal", "panjabi","pant", "t-shirt", "Western","winter-wear" ]
-	const gotoCategory=(key)=>{
+	const boyAll = ['daily-life', 'formal', 'panjabi', 'pant', 't-shirt', 'Western', 'winter-wear'];
+	const gotoCategory = (key) => {
 		window.open(`/auth/allproduct/boy/${key}`, '_self');
-	}
-
-
+	};
 </script>
 
 <nav class="fixed w-full">
@@ -74,13 +72,13 @@
 					>
 				</li>
 				<li>
-					<a href="/auth/reviews" class="flex items-center p-1 font-bold"
+					<a href="/auth/home" class="flex items-center p-1 font-bold"
 						><img
-							src="https://dxpcgmtdvyvcxbaffqmt.supabase.co/storage/v1/object/public/demo/review-svgrepo-com.svg"
+							src="https://dxpcgmtdvyvcxbaffqmt.supabase.co/storage/v1/object/public/demo/home-house-svgrepo-com.svg"
 							alt="Dashboard Icon"
 							class="h-7 mr-1 hover:rotate-12"
 						/>
-						Reviews</a
+						Home</a
 					>
 				</li>
 			</ul>
@@ -140,21 +138,20 @@
 	</div>
 </nav>
 
-
 <div class="md:pt-[100px]">
 	{#if !allproducts}
 		<div class="flex h-full w-full items-center justify-center">"Loading..."</div>
 	{:else}
-
 		<div class="flex justify-center">
 			<div class="w-1/5">
-					
 				<div class="list-none md:mt-16 md:sticky top-44 mr-2">
 					<p class="px-5 pl-6 text-[30px] font-bold border-b-[2px]">Category</p>
 					{#each boyAll as key}
-						<li class="cursor-pointer p-0 pl-6 m-2 mx-5  text-[24px] uppercase border-b-2 hover:scale-105">
-							<button on:click={()=>gotoCategory(key)}>
-								{#if key=="daily-life"}
+						<li
+							class="cursor-pointer p-0 pl-6 m-2 mx-5 text-[24px] uppercase border-b-2 hover:scale-105"
+						>
+							<button on:click={() => gotoCategory(key)}>
+								{#if key == 'daily-life'}
 									<span class="text-red-500 text-2xl">{key}</span>
 								{:else}
 									<span class="text-gray-500">{key}</span>
@@ -163,7 +160,6 @@
 						</li>
 					{/each}
 				</div>
-	
 			</div>
 			<div class="w-3/5">
 				<h1 class="font-extrabold text-4xl text-center font-serif">Daily Life</h1>
@@ -172,7 +168,9 @@
 					class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
 				>
 					{#each allproducts as item}
-						<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+						<div
+							class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl"
+						>
 							<a href="/auth/productview/{item.id}">
 								<img
 									src={item.payload.Image_links[0]}
@@ -185,7 +183,9 @@
 										{item.payload.Name}
 									</p>
 									<div class="flex items-center">
-										<p class="text-lg font-semibold text-black cursor-auto my-3">{item.payload.Price}</p>
+										<p class="text-lg font-semibold text-black cursor-auto my-3">
+											{item.payload.Price}
+										</p>
 									</div>
 								</div>
 							</a>
@@ -208,10 +208,8 @@
 				</form>
 			</div>
 		</div>
-			
 	{/if}
 </div>
-
 
 <style>
 	.links {

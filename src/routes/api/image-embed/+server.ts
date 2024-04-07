@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import type { RequestHandler } from '@sveltejs/kit';
 
+//Expection form-data with "image"
 export const POST = (async ({ request }) => {
 	const formData = await request.formData();
 

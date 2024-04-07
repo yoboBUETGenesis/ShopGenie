@@ -1,13 +1,14 @@
 <script>
 	// @ts-nocheck
 	import aarongimage from '$lib/images/Aarong Logo Vector.svg';
+	import { enhance } from '$app/forms';
 	import allen from '$lib/images/Allen.svg';
 	import apex from '$lib/images/apex.png';
 	import Slider from '$lib/components/Slider.svelte';
 
 	export let data;
-	let { session, supabase, userNow, item, itemCount, cartok, recommendation } = data;
-	$: ({ session, supabase, userNow, item, itemCount, cartok, recommendation } = data);
+	let { session, supabase, userNow, item, itemCount, cartok, recommendation, reviews } = data;
+	$: ({ session, supabase, userNow, item, itemCount, cartok, recommendation, reviews } = data);
 	const handleSignOut = async () => {
 		await data.supabase.auth.signOut();
 		window.open('/login', '_self');
@@ -22,6 +23,19 @@
 
 	let isOpenReview = false;
 	let isOpenSpec = false;
+
+	let productid;
+	let body;
+
+	let showaddmodal = false;
+	function addReviewModel() {
+		showaddmodal = true;
+		console.log('click new class');
+	}
+
+	function closeReviewModel() {
+		showaddmodal = false;
+	}
 </script>
 
 <div>
@@ -105,8 +119,8 @@
 						<li>
 							<a class="justify-between"> Profile </a>
 						</li>
-						<li><a>Settings</a></li>
-						<li><a>Logout</a></li>
+
+						<li><button on:click={handleSignOut}>Logout</button></li>
 					</ul>
 				</div>
 			</div>
@@ -120,16 +134,32 @@
 			</div>
 
 			<div class="w-full md:w-1/2 h-full flex flex-col justify-center">
-				<div class="flex flex-row space-x-3">
-					{#if item.payload.Company === 'Aarong'}
-						<img src={aarongimage} alt="" class="w-20 h-20" />
-					{:else if item.payload.Company === 'Allen Solly'}
-						<img src={allen} alt="" class="w-20 h-20" />
-					{:else}
-						<img src={apex} alt="" class="w-20 h-20" />
-					{/if}
-					<!-- <p class="font-extrabold text-xl mt-1">{item.payload.Company}</p> -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<div class="flex flex-row justify-between">
+					<div class="flex flex-row space-x-3">
+						{#if item.payload.Company === 'Aarong'}
+							<img src={aarongimage} alt="" class="w-20 h-20" />
+						{:else if item.payload.Company === 'Allen Solly'}
+							<img src={allen} alt="" class="w-20 h-20" />
+						{:else}
+							<img src={apex} alt="" class="w-20 h-20" />
+						{/if}
+						<!-- <p class="font-extrabold text-xl mt-1">{item.payload.Company}</p> -->
+					</div>
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<div
+						class="flex flex-row space-x-3 p-2 items-center justify-center rounded-lg bg-gray-200 hover:scale-105 hover:bg-gray-400"
+						on:click={addReviewModel}
+					>
+						<img
+							src="https://dxpcgmtdvyvcxbaffqmt.supabase.co/storage/v1/object/public/demo/plus-add-svgrepo-com.svg"
+							alt="Dashboard Icon"
+							class="h-6 mr-1 hover:rotate-12"
+						/>
+						<h1>Add New Review</h1>
+					</div>
 				</div>
+
 				<a href={item.payload.Link}>
 					<p class="text-[70px] leading-0 font-bold leading-tight">{item.payload.Name}</p>
 				</a>
@@ -140,7 +170,7 @@
 				<p class="text-[24px] text-justify my-4 text-[#5a5a59]">{item.payload.Description}</p>
 
 				<div class="flex justify-between border-b-[2px] border-black p-2">
-					<p class="text-[24px] font-bold">Reviews/Blogs</p>
+					<p class="text-[24px] font-bold">Reviews</p>
 					<div>
 						{#if isOpenReview}
 							<button on:click={() => (isOpenReview = !isOpenReview)}>
@@ -173,10 +203,30 @@
 				</div>
 				{#if isOpenReview}
 					<div class="text-[23px] ml-4 text-justify text-[#5a5a59]">
-						Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam aut excepturi voluptate?
-						Consectetur odio, quas doloremque temporibus reiciendis omnis rerum laborum rem culpa
-						nihil nostrum vel voluptate. Modi alias labore eius aperiam, qui optio architecto
-						eveniet dicta nesciunt dolorum voluptatum!
+						<h1 class="font-semibold">Positive Reviews</h1>
+						{#each reviews as review}
+							{#if review.sentiment === 'positive'}
+								<p>
+									{review.body}
+								</p>
+							{/if}
+						{/each}
+						<h1 class="font-semibold">Negative Reviews</h1>
+						{#each reviews as review}
+							{#if review.sentiment === 'negative'}
+								<p>
+									{review.body}
+								</p>
+							{/if}
+						{/each}
+						<h1 class="font-semibold">Neutral Reviews</h1>
+						{#each reviews as review}
+							{#if review.sentiment === 'neutral'}
+								<p>
+									{review.body}
+								</p>
+							{/if}
+						{/each}
 					</div>
 				{/if}
 
@@ -265,6 +315,50 @@
 				</div>
 			</div>
 		</div>
+		{#if showaddmodal}
+			<div
+				class="fixed inset-0 bg-sky-100 bg-opacity-50 flex justify-center items-center z-50 transition-opacity dark:text-[#e1e1e1]"
+			>
+				<div class="bg-blue-200 p-4 rounded-lg shadow-lg max-w-md w-full dark:bg-[#212020]">
+					<div class="flex justify-between items-center mb-3">
+						<h2 class="text-2xl font-bold">Add a Review</h2>
+						<button class=" text-lg" on:click={closeReviewModel}>&times;</button>
+					</div>
+
+					<form
+						use:enhance
+						class="flex flex-col items-center justify-center"
+						action="?/review"
+						method="POST"
+						on:submit={() => {
+							closeReviewModel();
+						}}
+					>
+						<div>
+							<h1 class="font-semibold">Review Body</h1>
+							<label class="label">
+								<textarea
+									class="textarea textarea-bordered dark:placeholder:text-[#ffffff9e]"
+									rows="4"
+									placeholder="Your Review"
+									id="body"
+									name="body"
+									bind:value={body}
+								/>
+							</label>
+							<div class="flex flex-col items-center justify-center">
+								<button
+									type="submit"
+									class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
+								>
+									Submit
+								</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		{/if}
 	</div>
 
 	<!-- related product -->

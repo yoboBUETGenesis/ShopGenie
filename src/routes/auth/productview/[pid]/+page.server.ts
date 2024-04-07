@@ -11,6 +11,11 @@ const client = new QdrantClient({
 });
 const collectionName = "products"
 
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY_1,
+});
+
 let userNow;
 let prid;
 export const load = async ({ params, locals: { supabase, getSession } }) => {
@@ -69,12 +74,26 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
         with_vector: false,
     });
 
-    console.log(recommendation);
-
-    // console.log(item)
+    // console.log(recommendation);
 
 
-    return { userNow, item, itemCount, cartok, recommendation };
+    let { data: reviews, error: err7 } = await supabase
+        .from('review')
+        .select("*")
+        .eq('pid', prid)
+
+
+    const groupedReviews = reviews.reduce((acc, review) => {
+        const { sentiment } = review;
+        acc[sentiment] = acc[sentiment] || [];
+        acc[sentiment].push(review);
+        return acc;
+    }, {});
+
+    console.log(groupedReviews);
+
+
+    return { userNow, item, itemCount, cartok, recommendation, reviews };
 }
 export const actions = {
     addtoCart: async ({ locals: { supabase, getSession } }) => {
@@ -92,6 +111,47 @@ export const actions = {
         if (err) console.log(err)
 
         else throw redirect(303, `/auth/productview/${prid}`);
+    },
+    review: async ({ request, locals: { supabase, getSession } }) => {
+        const data = await request.formData();
+        //console.log("amar add class form holo", data);
+
+        let newReview = Object.fromEntries(data.entries()) as any;
+        const prompt = `Determine the sentiment of the following text: ${newReview.body}. Select whether positive, negative or neutral`;
+        const response = await openai
+            .completions.create({
+                model: "gpt-3.5-turbo-instruct",
+                prompt: prompt,
+                temperature: 0.1,
+                max_tokens: 5,
+                top_p: 1,
+                frequency_penalty: 0,
+                presence_penalty: 0,
+            })
+        // console.log(response)
+        const sentiment = response.choices[0].text;
+        const sentimentLowerCase = sentiment.toLowerCase();
+        let result = '';
+        if (sentimentLowerCase.includes("positive")) {
+            result = "positive";
+        } else if (sentimentLowerCase.includes("negative")) {
+            result = "negative";
+        } else {
+            result = "neutral";
+        }
+
+
+        const { data: dtt, error: err } = await supabase
+            .from('review')
+            .insert([
+                { uid: userNow.id, pid: prid, body: newReview.body, sentiment: result },
+            ])
+            .select()
+
+        if (err) console.log(err)
+
+        else throw redirect(303, `/auth/productview/${prid}`);
+
     },
 
 }

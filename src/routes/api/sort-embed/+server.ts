@@ -18,7 +18,7 @@ const openai = new OpenAI({
 });
 
 async function create_embedding(query: string, combined_result: String) {
-    const prompt = "The original query was: " + query + ". Vector database returned the following products\n" + combined_result + "\nReturn  a list of ids if the corresponding item relevant to the query. Only return the list. Not a single additional token. Make sure the list size is strictly less than 10. Ensure that the list is ordered based on the degree of similarity.For Example: a result can be like this: [5, 0, 6, 8, 10, 12, 2, 5, 4]. The list size can be anything less than 10. But they should be most relevant";
+    const prompt = "The original query was: " + query + ". Vector database returned the following products\n" + combined_result + "\nReturn  a list of ids if the corresponding item relevant to the query. Only return the list. Not a single additional token. Make sure the list size is strictly less than 10. Ensure that the list is ordered based on the degree of similarity.For Example: a result can be like this: [5, 0, 6, 8, 10, 12, 2, 5, 4]. The list size can be anything less than 10. But you MUST return a list of IDs of the most relevant products for the query";
     // const response = await openai
     //     .completions.create({
     //         model: "gpt-3.5-turbo-0125",

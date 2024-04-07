@@ -161,6 +161,7 @@
 
 		const res = await ret.json();
 		console.log(res);
+
 		textSearchResult = res['list'];
 
 		context = '';
@@ -175,7 +176,9 @@
 				'. It is a ' +
 				textSearchResult[i].payload.Name +
 				'. ' +
-				textSearchResult[i].payload.Description;
+				textSearchResult[i].payload.Description +
+				'. Price' +
+				textSearchResult[i].payload.Price;
 			context += '\n';
 		}
 		console.log(context);
@@ -188,6 +191,7 @@
 		});
 
 		const res2 = await ret2.json();
+		console.log(res2['text']);
 		const finlList = JSON.parse(res2['text']);
 		// console.log(res2['text']);
 		let tempo = [];

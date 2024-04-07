@@ -204,37 +204,44 @@
 
 	<div class="w-full flex">
 		<div class="w-1/5 md:flex justify-center ">
-			<div class="w-full m-3">
-				<div class="grid grid-rows-4  md:sticky top-[330px]">
-					<div class="h-[80px] border-[2px] flex items-center">
-						<a href="/auth/products/men">
-							<img src={maleModel} alt="" class="h-[80px] w-[60px]" />
-						</a>
-						<p class="px-2 font-bold text-[22px]">Men</p>
-					</div>
-					<div class="h-[80px] border-[2px] flex items-center">
-						<a href="/auth/products/kids/boy">
-							<img src={femaleModel} alt="" class="h-[80px] w-[60px]" />
-						</a>
-						<p class="px-2 font-bold text-[22px]">Women</p>
-					</div>
-					<div class="h-[80px] border-[2px] flex items-center">
-						<a href="/auth/products/kids/boy">
-							<img src={boyModel} alt="" class="h-[80px] w-[60px]" />
-						</a>
-						<p class="px-2 font-bold text-[22px]">Boy</p>
-					</div>
-					<div class="h-[80px] border-[2px] flex items-center">
-						<a href="/auth/products/kids/girl">
-							<img src={girlModel} alt="" class="h-[80px] w-[60px]" />
-						</a>
-						<p class="px-2 font-bold text-[22px]">Girl</p>
-					</div>
+			<div class="w-full m-3 pl-4">
+				<div class="grid grid-rows-4  md:sticky top-[350px] space-y-[.5px]">
+					<a href="/auth/products/men" class="cursor-pointer hover:scale-105">
+
+						<div class="h-[100px] border-[2px] flex items-center">
+								<img src={maleModel} alt="" class="h-[100px] w-[80px]" />
+							
+							<p class="px-2 text-[22px]">Men</p>
+						</div>
+					</a>
+					<a href="/auth/products/women" class="cursor-pointer hover:scale-105">
+						<div class="h-[100px] border-[2px] flex items-center">
+							
+								<img src={femaleModel} alt="" class="h-[100px] w-[80px]" />
+							<p class="px-2  text-[22px]">Women</p>
+						</div>
+					</a>
+					<a href="/auth/products/kids/boy" class="cursor-pointer hover:scale-105">
+						<div class="h-[100px] border-[2px] flex items-center">
+							
+								<img src={boyModel} alt="" class="h-[100px] w-[80px]" />
+							
+							<p class="px-2  text-[22px]">Boy</p>
+						</div>
+					</a>
+					<a href="/auth/products/kids/girl" class="cursor-pointer hover:scale-105">
+						<div class="h-[100px] border-[2px] flex items-center">
+							
+								<img src={girlModel} alt="" class="h-[100px] w-[80px]" />
+							
+							<p class="px-2  text-[22px]">Girl</p>
+						</div>
+					</a>
 				</div>
 			</div>
 		</div>
 	
-		<div class="w-4/5">
+		<div class="w-4/5 border-l-[1px]">
 			<div class="flex flex-col items-center justify-center mt-10">
 				<h1 class="font-extrabold text-2xl">Recommended for You</h1>
 			</div>

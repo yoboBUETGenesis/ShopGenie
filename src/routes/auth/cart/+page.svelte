@@ -2,7 +2,9 @@
 	import genie from '$lib/images/genie.png';
 	import { enhance } from '$app/forms';
 	import Themeswitcher from '$lib/themeswitcher.svelte';
-
+	import aarongimage from '$lib/images/Aarong Logo Vector.svg';
+	import allen from '$lib/images/Allen.svg';
+	import apex from '$lib/images/apex.png';
 	export let data;
 	let { session, supabase, userNow, items } = data;
 	$: ({ session, supabase, userNow, items } = data);
@@ -184,7 +186,14 @@
 								/>
 							</div>
 							<div class="flex items-center space-x-2">
-								<span class="text-gray-400 uppercase text-xs">{item.payload.Company}</span>
+								{#if item.payload.Company === 'Aarong'}
+									<img src={aarongimage} alt="" class="w-10 h-10" />
+								{:else if item.payload.Company === 'Allen Solly'}
+									<img src={allen} alt="" class="w-10 h-10" />
+								{:else}
+									<img src={apex} alt="" class="w-10 h-10" />
+								{/if}
+								
 								<p class="text-lg font-bold text-black truncate block capitalize">{item.payload.Name}</p>
 								
 							</div>
@@ -192,7 +201,7 @@
 						</div>
 					</a>
 					<div class="p-4 flex space-x-2 items-center">
-						<div class="flex items-center">
+						<div class="flex items-center p-4">
 							<p class="text-lg font-semibold text-black cursor-auto">{item.payload.Price}</p>
 						</div>
 						<form
@@ -203,8 +212,8 @@
 							<button type="submit">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
+									width="24"
+									height="24"
 									fill="currentColor"
 									class="bi bi-trash"
 									viewBox="0 0 16 16"

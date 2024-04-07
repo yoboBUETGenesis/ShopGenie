@@ -10,6 +10,9 @@ const client = new QdrantClient({
     apiKey: process.env.QDRANT_API_KEY,
 });
 const collectionName = "products"
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY_2 || ''
+});
 
 let userNow;
 export const load = async ({ locals: { supabase, getSession } }) => {
@@ -92,6 +95,38 @@ export const actions = {
         console.log(apiResponse);
         // throw redirect(303, '/auth/query');
     },
+    audio: async ({ request, locals: { supabase, getSession } }) => {
+        const formData = (await request.formData()) as any;
+        const audioFile = formData.get('audioFile');
+        const textQ = formData.get('textquery');
+        const image = formData.get('image');
+        // console.log(textQ);
+        // console.log(image);
+        // console.log(audioFile);
+
+        const transcription = await openai.audio.transcriptions.create({
+            file: audioFile,
+            model: 'whisper-1',
+            response_format: 'text'
+        });
+
+
+        console.log("text holo ", textQ);
+        console.log("image holo ", image);
+
+        console.log(transcription);
+        return {
+            success: "done",
+            text: transcription
+        }
+
+        // return new Response(
+        //     JSON.stringify({
+        //         success: "done",
+        //         text: transcription
+        //     })
+        // );
+    }
 
 
 }

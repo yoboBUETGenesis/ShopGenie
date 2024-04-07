@@ -1,9 +1,62 @@
-<script>
+<script lang="ts">
 	import genie from '$lib/images/genie.png';
 	import { enhance } from '$app/forms';
 	import Themeswitcher from '$lib/themeswitcher.svelte';
+	import { onMount } from 'svelte';
+	// import { Pulse } from 'svelte-loading-spinners';
+
+	let recognizedSpeech = '';
+	let hearingRunning = false;
+	let mediaRecorder: any;
+	let chunks: any[] = [];
+
+	function handleHearingStart() {
+		hearingRunning = true;
+		startRecording();
+	}
+
+	function handleHearingStop() {
+		stopRecording();
+		hearingRunning = false;
+	}
+	async function startRecording() {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		mediaRecorder = new MediaRecorder(stream);
+
+		mediaRecorder.ondataavailable = function (e) {
+			chunks.push(e.data);
+		};
+
+		mediaRecorder.onstop = async function () {
+			const blob = await new Blob(chunks, { type: 'audio/mp3' });
+			const recordedAudioFile = await new File([blob], 'recorded_audio.mp3', { type: 'audio/mp3' });
+			// console.log(recordedAudioFile)
+
+			const formData = new FormData();
+			formData.append('audioFile', recordedAudioFile);
+
+			const ret = await fetch('/api/transcribe', {
+				method: 'POST',
+				body: formData
+			});
+
+			const res = await ret.json();
+			recognizedSpeech = res['text'];
+
+			chunks = [];
+		};
+
+		mediaRecorder.start();
+	}
+
+	function stopRecording() {
+		mediaRecorder.stop();
+	}
+
+	onMount(() => {});
 
 	export let data;
+	export let form;
 	let { session, supabase, userNow, itemCount } = data;
 	$: ({ session, supabase, userNow, itemCount } = data);
 	const handleSignOut = async () => {
@@ -29,6 +82,12 @@
 	function gotocart() {
 		window.open('/auth/cart', '_self');
 	}
+	// $: {
+	// 	if (form?.success === 'done') {
+	// 		console.log(form.text);
+	// 	}
+	// 	form?.success = "";
+	// }
 </script>
 
 <nav class="p-4">
@@ -124,34 +183,36 @@
 </nav>
 
 {#if showaddmodal}
-	<div class="bg-blue-200 p-6 rounded-lg shadow-lg w-full m-4 dark:bg-[#212020]">
+	<div class="p-6 rounded-lg w-full m-4 dark:bg-[#212020]">
 		<div class="flex flex-col justify-center items-center mb-3">
-			<h2 class="text-2xl font-bold">Add a new class</h2>
+			<h2 class="text-2xl font-bold font-serif">Input For Query</h2>
 		</div>
 
 		<form
 			use:enhance
 			action="?/upload"
 			method="POST"
-			class="flex flex-row space-x-4"
+			class="space-x-4"
+			enctype="multipart/form-data"
 			on:submit={() => {
 				closeclassmodal();
 			}}
 		>
-			<div>
-				<h1>Textual Query</h1>
+			<div class="flex flex-row space-x-10">
+				<div class="w-1/3">
+					<h1>Textual Query</h1>
 
-				<input
-					class="input dark:placeholder:text-[#ffffff9e] w-full max-w-xs"
-					type="text"
-					id="textquery"
-					name="textquery"
-					bind:value={textquery}
-					placeholder="Enter The Query"
-				/>
-
-				<label class="label text-left mb-3">
-					<span>Photo (optional)</span>
+					<input
+						class="input input-bordered dark:placeholder:text-[#ffffff9e] w-full max-w-xs"
+						type="text"
+						id="textquery"
+						name="textquery"
+						bind:value={textquery}
+						placeholder="Enter The Query"
+					/>
+				</div>
+				<div class="w-1/3">
+					<h1>Photo (optional)</h1>
 
 					<input
 						class="file-input w-full max-w-xs"
@@ -160,7 +221,35 @@
 						name="image"
 						bind:value={image}
 					/>
-				</label>
+				</div>
+				{#if hearingRunning}
+					<button
+						class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
+						disabled={true}
+						on:click={handleHearingStart}
+					>
+						Recording
+					</button>
+				{:else}
+					<button
+						class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
+						on:click={handleHearingStart}>Hearing Start</button
+					>
+				{/if}
+				{#if hearingRunning}
+					<button
+						class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
+						on:click={handleHearingStop}>Hearing Stop</button
+					>
+				{:else}
+					<button
+						class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
+						disabled
+						on:click={handleHearingStop}>Hearing Stop</button
+					>
+				{/if}
+			</div>
+			<div class="mt-9 flex flex-col items-center justify-center">
 				<button
 					type="submit"
 					class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"

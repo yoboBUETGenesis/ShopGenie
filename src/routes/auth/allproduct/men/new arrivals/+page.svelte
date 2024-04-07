@@ -17,7 +17,6 @@
 
 	$: allproducts = data.allproducts;
 	$: allproducts = [...allproducts, ...newProducts];
-
 	$: {
 		// console.log(form?.success);
 		newProducts = [];
@@ -39,9 +38,14 @@
 	function gotocart() {
 		window.open('/auth/cart', '_self');
 	}
+
+	const menAll = ["new arrivals", "panjabi", "shirts", "t-shirts","formal pant" , "casual pant", "suit","Coaty-Fatua","wallets","Footwear" ]
+	const gotoCategory=(key)=>{
+		window.open(`/auth/allproduct/men/${key}`, '_self');
+	}
 </script>
 
-<nav class="p-4">
+<nav class="fixed w-full">
 	<div class="navbar bg-base-100">
 		<div class="flex-1">
 			<div class="flex-1">
@@ -133,50 +137,74 @@
 	</div>
 </nav>
 
-{#if !allproducts}
-	<div class="flex h-full w-full items-center justify-center">"Loading..."</div>
-{:else}
-	<h1 class="font-extrabold text-4xl text-center font-serif">New Arrival</h1>
-	<section
-		id="Projects"
-		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
-	>
-		{#each allproducts as item}
-			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-				<a href="/auth/productview/{item.id}">
-					<img
-						src={item.payload.Image_links[0]}
-						alt="Product"
-						class="h-80 w-72 object-cover rounded-t-xl"
-					/>
-					<div class="px-4 py-3 w-72">
-						<span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span>
-						<p class="text-lg font-bold text-black truncate block capitalize">
-							{item.payload.Name}
-						</p>
-						<div class="flex items-center">
-							<p class="text-lg font-semibold text-black cursor-auto my-3">{item.payload.Price}</p>
-						</div>
-					</div>
-				</a>
+<div class="md:pt-[100px]">
+	{#if !allproducts}
+		<div class="flex h-full w-full items-center justify-center text-red-600 text-[100px]">"Loading..."</div>
+	{:else}
+		<div class="flex justify-center">
+			<div class="w-1/5">
+					
+				<div class="list-none md:mt-16 md:sticky top-44 mr-2">
+					<p class="px-5 pl-6 text-[30px] font-bold border-b-[2px]">Category</p>
+					{#each menAll as key}
+						<li class="cursor-pointer p-0 pl-6 m-2 mx-5  text-[24px] uppercase border-b-2 hover:scale-105">
+							<button on:click={()=>gotoCategory(key)}>
+								{#if key.toString().toLowerCase()=="New Arrivals".toLowerCase()}
+									<span class="text-red-500 text-2xl">{key}</span>
+								{:else}
+									<span class="text-gray-500">{key}</span>
+								{/if}
+							</button>
+						</li>
+					{/each}
+				</div>
+	
 			</div>
-		{/each}
-	</section>
-	<form
-		class="mt-5 flex flex-col items-center justify-center mb-6"
-		use:enhance={() => {
-			return async ({ update }) => {
-				update({ reset: false, invalidateAll: false });
-			};
-		}}
-		action="?/search"
-		method="post"
-	>
-		<button class="btn rounded-md bg-green-500 hover:bg-green-700 font-bold" type="submit"
-			>Load More</button
-		>
-	</form>
-{/if}
+			<div class="w-3/5">
+				<h1 class="font-extrabold text-4xl text-center font-serif">New Arrival</h1>
+				<section
+					id="Projects"
+					class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+				>
+					{#each allproducts as item}
+						<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+							<a href="/auth/productview/{item.id}">
+								<img
+									src={item.payload.Image_links[0]}
+									alt="Product"
+									class="h-80 w-72 object-top rounded-t-xl"
+								/>
+								<div class="px-4 py-3 w-72">
+									<span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span>
+									<p class="text-lg font-bold text-black truncate block capitalize">
+										{item.payload.Name}
+									</p>
+									<div class="flex items-center">
+										<p class="text-lg font-semibold text-black cursor-auto my-3">{item.payload.Price}</p>
+									</div>
+								</div>
+							</a>
+						</div>
+					{/each}
+				</section>
+				<form
+					class="mt-5 flex flex-col items-center justify-center mb-6"
+					use:enhance={() => {
+						return async ({ update }) => {
+							update({ reset: false, invalidateAll: false });
+						};
+					}}
+					action="?/search"
+					method="post"
+				>
+					<button class="btn rounded-md bg-green-500 hover:bg-green-700 font-bold" type="submit"
+						>Load More</button
+					>
+				</form>
+			</div>
+		</div>
+	{/if}
+</div>
 
 <style>
 	.links {

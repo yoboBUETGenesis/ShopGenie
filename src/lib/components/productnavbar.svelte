@@ -8,7 +8,7 @@
 	}
 </script>
 
-<nav class="p-4">
+<nav class="w-full fixed ">
 	<div class="navbar bg-base-100">
 		<div class="flex-1">
 			<div class="flex-1">

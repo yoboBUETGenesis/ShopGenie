@@ -120,7 +120,7 @@
 				<img
 					src={item.payload.Image_links[0]}
 					alt="Product"
-					class="h-80 w-72 object-cover rounded-t-xl"
+					class="h-80 w-72 object-top rounded-t-xl"
 				/>
 				<div class="px-4 py-3 w-72">
 					<span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span>

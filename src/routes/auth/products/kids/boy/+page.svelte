@@ -42,7 +42,7 @@
 
 
 
-<div>
+<div class="pt-[100px]">
 	{#if isLoading}
 	<div class="flex justify-center">
 		<div class="w-1/5 ">
@@ -102,7 +102,7 @@
 			</div>
 			<div class="w-3/5">
 				{#each Object.keys(boyAll) as key}
-					<div class="my-5">
+					<div class="my-5" id={key}>
 						<div class="flex flex-row justify-between">
 							<p class="text-[35px] font-bold uppercase py-5">{key}</p>
 							<button class="flex flex-row space-x-2 py-5 mt-2" on:click={() => gotoCategory(key)}>
@@ -110,7 +110,7 @@
 								<img
 									src={rightArrow}
 									alt="Product"
-									class="h-8 object-cover rounded-t-xl hover:scale-125"
+									class="h-8 object-top rounded-t-xl hover:scale-125"
 								/>
 							</button>
 						</div>
@@ -125,7 +125,7 @@
 											<img
 												src={item.payload.Image_links[0]}
 												alt="Product"
-												class="h-80 w-72 object-cover rounded-t-xl hover:scale-105"
+												class="h-80 w-72 object-top rounded-t-xl hover:scale-105"
 											/>
 											<div class="px-4 py-3 w-72">
 												<span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span>

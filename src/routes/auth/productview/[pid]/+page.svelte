@@ -33,11 +33,21 @@
 	function addReviewModel() {
 		showaddmodal = true;
 		console.log('click new class');
+		console.log(groupedReviews)
 	}
-
 	function closeReviewModel() {
 		showaddmodal = false;
 	}
+
+	let showReview = false;
+	const checkReviews = ()=>{
+		showReview = true;
+	}
+	const closeReviews = ()=>{
+		showReview = false;
+	}
+
+	
 	let chart = null; // This will hold the chart instance
 	let chartContainer;
 
@@ -217,7 +227,7 @@
 				</div>
 
 				<a href={item.payload.Link}>
-					<p class="text-[70px] leading-0 font-bold leading-tight">{item.payload.Name}</p>
+					<p class="text-[66px] hover:scale-x-105 leading-0 font-bold leading-tight">{item.payload.Name}</p>
 				</a>
 				<p>
 					<span class="font-semibold">Category &gt</span>
@@ -260,39 +270,15 @@
 				{#if isOpenReview}
 					<div class="text-[23px] ml-4 text-justify text-[#5a5a59]">
 						{#if groupedReviews}
-							<canvas bind:this={chartContainer} width="400" height="400"></canvas>
-							<h1 class="font-semibold">Positive Reviews</h1>
-							{#if groupedReviews.positive}
-								{#each groupedReviews.positive as review}
-									<p>
-										{review.body}
-									</p>
-								{/each}
-							{:else}
-								<p>No positive reviews</p>
-							{/if}
-							<h1 class="font-semibold">Negative Reviews</h1>
-							{#if groupedReviews.negative}
-								<ul>
-									{#each groupedReviews.negative as review}
-										<li>
-											{review.body}
-										</li>
-									{/each}
-								</ul>
-							{:else}
-								<p>No negative review</p>
-							{/if}
-							<h1 class="font-semibold">Neutral Reviews</h1>
-							{#if groupedReviews.neutral}
-								{#each groupedReviews.neutral as review}
-									<p>
-										{review.body}
-									</p>
-								{/each}
-							{:else}
-								<p>No neutral review</p>
-							{/if}
+							<div class="flex justify-center items-center w-full">
+								<div class="h-[300px]">
+									<canvas bind:this={chartContainer}></canvas>
+								</div>
+								<div>
+									<button on:click={checkReviews} class="px-4 m-4 py-2 border-[2px] border-black hover:scale-105">Check Reviews</button>
+									
+								</div>
+							</div>
 						{:else}
 							<p>No reviews Yet</p>
 						{/if}
@@ -386,28 +372,27 @@
 		</div>
 		{#if showaddmodal}
 			<div
-				class="fixed inset-0 bg-sky-100 bg-opacity-50 flex justify-center items-center z-50 transition-opacity dark:text-[#e1e1e1]"
+				class="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center z-50 transition-opacity "
 			>
-				<div class="bg-blue-200 p-4 rounded-lg shadow-lg max-w-md w-full dark:bg-[#212020]">
-					<div class="flex justify-between items-center mb-3">
-						<h2 class="text-2xl font-bold">Add a Review</h2>
+				<div class="bg-[#f9f7f7] p-4 border-[2px] border-black shadow-lg max-w-md w-full dark:bg-[#212020]">
+					<div class="flex w-full  justify-between items-center mb-3">
+						<h2 class="text-2xl font-bold ml-5">Add a Review</h2>
 						<button class=" text-lg" on:click={closeReviewModel}>&times;</button>
 					</div>
 
 					<form
 						use:enhance
-						class="flex flex-col items-center justify-center"
+						class="flex flex-col items-center justify-center  w-full"
 						action="?/review"
 						method="POST"
 						on:submit={() => {
 							closeReviewModel();
 						}}
 					>
-						<div>
-							<h1 class="font-semibold">Review Body</h1>
-							<label class="label">
+						<div class="w-4/5">
+							<label class="label w-full">
 								<textarea
-									class="textarea textarea-bordered dark:placeholder:text-[#ffffff9e]"
+									class="textarea textarea-bordered w-full border-[2px] border-black dark:placeholder:text-[#ffffff9e]"
 									rows="4"
 									placeholder="Your Review"
 									id="body"
@@ -415,16 +400,63 @@
 									bind:value={body}
 								/>
 							</label>
-							<div class="flex flex-col items-center justify-center">
+							<div class="flex justify-end items-center  w-full">
 								<button
 									type="submit"
-									class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
+									class=" text-xl px-4 py-2 m-2 font-semibold dark:text-[#e1e1e1]  bg-white border-[2px] border-black shadow-md hover:scale-105  dark:hover:bg-[#efefef]"
 								>
 									Submit
 								</button>
 							</div>
 						</div>
 					</form>
+				</div>
+			</div>
+		{/if}
+
+		{#if showReview}
+			<div
+				class="fixed inset-0 bg-white bg-opacity-50 w-full flex justify-center items-center z-50 transition-opacity "
+			>
+				<div class="bg-[#fcfcfc] p-4 border-[2px] border-black shadow-lg w-3/5 dark:bg-[#212020]">
+					<div class="flex w-full  justify-between items-center mb-3">
+						<h2 class="text-[32px] font-bold p-2 m-2">Reviews</h2>
+						<button class="text-[24px]" on:click={closeReviews}>&times;</button>
+					</div>
+
+					<div class="grid grid-cols-3">
+						<div class="m-4 border-r-[2px] border-black">
+							<p class="text-[26px] underline font-bold">Positive</p>
+							<ul>
+								{#each groupedReviews.positive as review}
+									<li>
+										{review.body}
+									</li>
+								{/each}
+							</ul>
+						</div>
+						<div class="m-4 border-r-[2px] border-black">
+							<p class="text-[26px] underline font-bold">Negative</p>
+							<ul>
+								{#each groupedReviews.negative as review}
+									<li>
+										{review.body}
+									</li>
+								{/each}
+							</ul>
+						</div>
+						<div class="m-4 ">
+							<p class="text-[26px] underline font-bold">Neutral</p>
+							<ul>
+								{#each groupedReviews.neutral as review}
+									<li>
+										{review.body}
+									</li>
+								{/each}
+							</ul>
+
+						</div>
+					</div>
 				</div>
 			</div>
 		{/if}

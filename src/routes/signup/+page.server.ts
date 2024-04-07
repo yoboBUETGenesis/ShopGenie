@@ -52,7 +52,7 @@ export const actions = {
             email: body.email as string,
             password: body.password as string,
             options: {
-                emailRedirectTo: `http://localhost:5173/login`,
+                emailRedirectTo: `https://workspace-lyart-eight.vercel.app/login`,
             },
         });
         if (dtt.user && dtt.user.identities && dtt.user.identities.length === 0) {

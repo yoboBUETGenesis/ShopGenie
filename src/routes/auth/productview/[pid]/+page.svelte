@@ -485,7 +485,7 @@
 		</section>
 	</div>
 </div>
-<pre>{JSON.stringify(groupedReviews, null, 2)}</pre>
+
 
 <style>
 	.links {

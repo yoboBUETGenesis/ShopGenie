@@ -1,15 +1,49 @@
 <script>
+	import ShortFooter from '$lib/components/shortFooter.svelte';
 	import genie from '$lib/images/genie.png';
+	import aarongimage from '$lib/images/Aarong Logo Vector.svg';
+	import allen from '$lib/images/Allen.svg';
+	import apex from '$lib/images/apex.png';
+	import cloth from '$lib/images/clothes-svgrepo-com.svg';
+	import userface from '$lib/images/user-circle.svg';
+	import brand from '$lib/images/brand.svg';
 	import { enhance } from '$app/forms';
-	import femaleModel from '$lib/images/femaleModel.jpeg'
-	import maleModel from '$lib/images/maleModel.jpg'
-	import boyModel from '$lib/images/boyModel.jpg'
+	import femaleModel from '$lib/images/femaleModel.jpeg';
+	import maleModel from '$lib/images/maleModel.jpg';
+	import boyModel from '$lib/images/boyModel.jpg';
+	import { onMount } from 'svelte';
 
 	import Themeswitcher from '$lib/themeswitcher.svelte';
+	let numProducts = 20833;
+	let displayednumProducts = 0;
+	let numcompanies = 5;
+	let displayednumcompanies = 0;
+	let totalUser = 100;
+	let displayedtotalUser = 0;
 
 	export let data;
-	let { session, supabase, userNow, itemCount } = data;
-	$: ({ session, supabase, userNow, itemCount } = data);
+	let { session, supabase, userNow, itemCount, items } = data;
+	$: ({ session, supabase, userNow, itemCount, items } = data);
+	const animateValue = (start, end, duration, incrementStep, callback) => {
+		const range = end - start;
+		let current = start;
+		const increment = end > start ? incrementStep : -incrementStep;
+		const stepTime = Math.abs(Math.floor(duration / (range / incrementStep)));
+		const timer = setInterval(function () {
+			current += increment;
+			if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+				current = end;
+				clearInterval(timer);
+			}
+			callback(current);
+		}, stepTime);
+	};
+	async function getAnimation() {
+		animateValue(0, numProducts, 1000, 2786, (val) => (displayednumProducts = val));
+		animateValue(0, numcompanies, 1500, 1, (val) => (displayednumcompanies = val));
+		animateValue(0, totalUser, 1000, 10, (val) => (displayedtotalUser = val));
+	}
+
 	const handleSignOut = async () => {
 		console.log('logout start');
 		await data.supabase.auth.signOut();
@@ -20,8 +54,10 @@
 	function gotocart() {
 		window.open('/auth/cart', '_self');
 	}
+	onMount(() => {
+		getAnimation();
+	});
 </script>
-
 
 <div>
 	<nav class="p-4">
@@ -51,13 +87,13 @@
 					</li>
 					<li>
 						<a href="/auth/home" class="flex items-center p-1 font-bold"
-						><img
-							src="https://dxpcgmtdvyvcxbaffqmt.supabase.co/storage/v1/object/public/demo/home-house-svgrepo-com.svg"
-							alt="Dashboard Icon"
-							class="h-7 mr-1 hover:rotate-12"
-						/>
-						Home</a
-					>
+							><img
+								src="https://dxpcgmtdvyvcxbaffqmt.supabase.co/storage/v1/object/public/demo/home-house-svgrepo-com.svg"
+								alt="Dashboard Icon"
+								class="h-7 mr-1 hover:rotate-12"
+							/>
+							Home</a
+						>
 					</li>
 				</ul>
 				<div class="dropdown dropdown-end ml-5">
@@ -107,7 +143,7 @@
 								<span class="badge">New</span>
 							</a>
 						</li>
-	
+
 						<li><button on:click={handleSignOut}>Logout</button></li>
 					</ul>
 				</div>
@@ -115,38 +151,152 @@
 		</div>
 	</nav>
 
-	
-	<div class="w-full md:flex justify-center items-center md:h-[calc(100vh-150px)]">
-		
+	<section class="flex flex-col items-center justify-center space-x-8 mt-6">
+		<h1 class="font-extrabold text-3xl font-serif">
+			Stay with Us!! The Largest fashion Collection at your hand
+		</h1>
+		<div class="stats shadow">
+			<div class="stat mr-6">
+				<div class="stat-figure text-primary">
+					<img
+						src={cloth}
+						alt="Prescription Icon"
+						class="w-16 h-16 transform transition duration-300 hover:rotate-12"
+					/>
+				</div>
+				<div class="stat-title">Total Products</div>
+				<div class="stat-value text-primary">
+					{displayednumProducts}
+				</div>
+			</div>
+			<div class="stat mr-6">
+				<div class="stat-figure text-secondary">
+					<img
+						src={brand}
+						alt="Prescription Icon"
+						class="w-16 h-16 transform transition duration-300 hover:rotate-12"
+					/>
+				</div>
+				<div class="stat-title">Total Companies</div>
+				<div class="stat-value text-secondary">
+					{displayednumcompanies}
+				</div>
+			</div>
+			<div class="stat">
+				<div class="stat-figure text-secondary">
+					<img
+						src={userface}
+						alt="Prescription Icon"
+						class="w-16 h-16 transform transition duration-300 hover:rotate-12"
+					/>
+				</div>
+				<div class="stat-title">Total User</div>
+				<div class="stat-value text-accent">
+					{displayedtotalUser}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="flex flex-col items-center justify-center mt-10">
+		<h1 class="font-extrabold text-2xl">Recommended for You</h1>
+	</div>
+
+	<section
+		id="Projects"
+		class="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
+	>
+		{#each items as item}
+			<div class="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+				<a href="/auth/productview/{item.id}">
+					<img
+						src={item.payload.Image_links[0]}
+						alt="Product"
+						class="h-80 w-72 object-top rounded-t-xl"
+					/>
+					<div class="px-4 py-3 w-72">
+						<!-- <span class="text-gray-400 mr-3 uppercase text-xs">{item.payload.Company}</span> -->
+						<div class="flex flex-row space-x-3">
+							{#if item.payload.Company === 'Aarong'}
+								<img src={aarongimage} alt="" class="w-12 h-12" />
+							{:else if item.payload.Company === 'Allen Solly'}
+								<img src={allen} alt="" class="w-12 h-12" />
+							{:else}
+								<img src={apex} alt="" class="w-12 h-12" />
+							{/if}
+							<!-- <p class="font-semibold">{item.payload.Company}</p> -->
+						</div>
+						<p class="text-lg font-bold text-black truncate block capitalize">
+							{item.payload.Name}
+						</p>
+						<div class="flex items-center">
+							<p class="text-lg font-semibold text-black cursor-auto my-3">{item.payload.Price}</p>
+						</div>
+					</div>
+				</a>
+			</div>
+		{/each}
+		<!--   ✅ Product card 1 - Starts Here 👇 -->
+	</section>
+
+	<!-- <div class="w-full md:flex justify-center items-center md:h-[calc(100vh-150px)]">
 		<div class="w-3/4">
-			<div class="grid grid-cols-4 gap-3 h-[60vh] ">  
+			<div class="grid grid-cols-4 gap-3 h-[60vh]">
 				<div class="h-full border-[2px]">
 					<a href="/auth/products/men">
-						<img src={maleModel} alt="" class="h-full">
+						<img src={maleModel} alt="" class="h-full" />
 					</a>
 				</div>
 				<div class="h-full border-[2px]">
 					<a href="/auth/products/kids/boy">
-						<img src={femaleModel} alt="" class="h-full">
+						<img src={femaleModel} alt="" class="h-full" />
 					</a>
 				</div>
 				<div class="h-full border-[2px]">
 					<a href="/auth/products/kids/boy">
-						<img src={boyModel} alt="" class="h-full">
+						<img src={boyModel} alt="" class="h-full" />
 					</a>
 				</div>
 				<div class="h-full border-[2px]">
 					<a href="/auth/products/kids/girl">
-						<img src={boyModel} alt="" class="h-full">
+						<img src={boyModel} alt="" class="h-full" />
 					</a>
 				</div>
 			</div>
-
 		</div>
-	</div>
+	</div> -->
+	<ShortFooter />
 </div>
 
+<!-- <pre>{JSON.stringify(items, null, 2)}</pre> -->
+
 <style>
+	.stat {
+		background-color: #fff;
+		padding: 30px;
+		border-radius: 10px;
+		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+	}
+
+	.stat-figure {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 10px;
+		background-color: #f3f4f6; /* Light gray */
+		border-radius: 50%;
+	}
+
+	.stat-title {
+		font-weight: 500;
+		margin-top: 10px;
+		margin-bottom: 5px;
+	}
+
+	.stat-value {
+		font-size: 1.5em;
+		font-weight: bold;
+	}
 	.links {
 		display: flex;
 		list-style: none;

@@ -4,6 +4,7 @@
 	import voice from '$lib/images/voice.gif';
 	import click from '$lib/images/click.gif';
 	import genie from '$lib/images/genie.png';
+	import ShortFooter from '$lib/components/shortFooter.svelte';
 
 	import { writable } from 'svelte/store';
 
@@ -577,6 +578,7 @@
 		</div>
 	</div>
 </div>
+<ShortFooter />
 
 <style>
 	@keyframes textOpacity {

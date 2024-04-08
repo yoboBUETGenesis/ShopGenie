@@ -116,21 +116,21 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
     return { userNow, item, itemCount, cartok, recommendation, groupedReviews };
 }
 export const actions = {
-    addtoCart: async ({ locals: { supabase, getSession } }) => {
+    addtoCart: async ({ url, locals: { supabase, getSession } }) => {
 
-
+        const proid = url.searchParams.get("id")
         // console.log("form", umail, taskname, description, deadline, importancescale)
 
         const { data, error: err } = await supabase
             .from('cart')
             .insert([
-                { uid: userNow.id, pid: prid },
+                { uid: userNow.id, pid: proid },
             ])
             .select()
 
         if (err) console.log(err)
 
-        else throw redirect(303, `/auth/productview/${prid}`);
+        else throw redirect(303, `/auth/productview/${proid}`);
     },
     review: async ({ request, locals: { supabase, getSession } }) => {
         const data = await request.formData();

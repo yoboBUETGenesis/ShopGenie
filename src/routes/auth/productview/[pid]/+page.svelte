@@ -451,7 +451,7 @@
 							<span class="text-[23px] p-1">Already Added</span>
 						</button>
 					{:else}
-						<form action="?/addtoCart" method="POST">
+						<form action="?/addtoCart&id={item.id}" method="POST">
 							<button class="flex items-center border-[2px] border-black p-3 px-8" type="submit">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"

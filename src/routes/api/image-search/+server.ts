@@ -16,26 +16,26 @@ export const POST = (async ({ request }) => {
     console.log(formData.get("imageLink"))
 
     const ret = await fetch('https://image-embed-server.onrender.com/image-embed', {
-		method: 'POST',
-		body: formData
-	});
+        method: 'POST',
+        body: formData
+    });
 
-	const res = await ret.json();
-	const img_emd = res['image_embeddings'];
+    const res = await ret.json();
+    const img_emd = res['image_embeddings'];
     // console.log(img_emd)
     const list = await client.search(collectionName, {
         vector: {
             name: "image",
             vector: img_emd,
         },
-        limit: 20,
+        limit: 25,
         with_payload: true,
         with_vector: false,
     });
 
     return new Response(
-		JSON.stringify({
-			list: list
-		})
-	);
+        JSON.stringify({
+            list: list
+        })
+    );
 }) satisfies RequestHandler;

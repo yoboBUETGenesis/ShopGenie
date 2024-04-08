@@ -30,7 +30,7 @@ function getKey() {
     // index = index % api_keys.length
     // console.log(index)
     // return api_keys[index]
-    return process.env.GOOGLE_API_KEY_2;
+    return process.env.GOOGLE_API_KEY_1;
 }
 
 

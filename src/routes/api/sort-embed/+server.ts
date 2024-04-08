@@ -91,7 +91,7 @@ async function create_embedding(query: string, combined_result: String) {
         model: "gpt-4-1106-preview", // Specify the model here
         prompt: prompt,
         temperature: 0.2, // Adjust as needed for your use case
-        max_tokens: 200,
+        max_tokens: 220,
         top_p: 1,
         frequency_penalty: 0.5,
         presence_penalty: 0,

@@ -28,7 +28,7 @@ export const POST = (async ({ request }) => {
             name: "image",
             vector: img_emd,
         },
-        limit: 6,
+        limit: 25,
         with_payload: true,
         with_vector: false,
     });

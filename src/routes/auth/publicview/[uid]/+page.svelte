@@ -54,9 +54,9 @@
 	// @ts-ignore
 	export let data;
 	// @ts-ignore
-	let { session, supabase, userNow, itemCount } = data;
+	let { session, supabase, userNow, viewUser, itemCount } = data;
 	// @ts-ignore
-	$: ({ session, supabase, userNow, itemCount } = data);
+	$: ({ session, supabase, userNow, viewUser, itemCount } = data);
 	// @ts-ignore
 	const handleSignOut = async () => {
 		console.log('logout start');
@@ -75,25 +75,6 @@
 			age--;
 		}
 		return age;
-	}
-	let dob = userNow.dob;
-	let dobModal = false;
-	function adddobModal() {
-		dobModal = true;
-	}
-
-	function closedobModal() {
-		dobModal = false;
-	}
-
-	let pic = userNow.image;
-	let picModal = false;
-	function addpicModal() {
-		picModal = true;
-	}
-
-	function closepicModal() {
-		picModal = false;
 	}
 </script>
 
@@ -188,6 +169,7 @@
 		</div>
 	</div>
 </nav>
+
 <section class="min-h-screen dark:text-[#e1e1e1] dark:bg-[#212020] titleSection">
 	<div class="flex flex-row space-x-24 pt-[100px] md:h-[calc(100vh-150px)]">
 		<div class="flex justify-center items-center w-full">
@@ -198,22 +180,21 @@
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<div class="h-full flex items-center p-5 md:border-r-[2px] border-black">
 					<img
-						src={userNow.image}
+						src={viewUser.image}
 						alt="User Image"
 						class="rounded-full w-[250px] h-[250px] object-cover"
-						on:click={addpicModal}
 					/>
 				</div>
 				<div class="h-full m-5">
 					<p class="text-4xl font-extrabold leading-0">
-						{userNow.name}
+						{viewUser.name}
 					</p>
 
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 					<!-- svelte-ignore a11y-img-redundant-alt -->
 
-					{#if userNow.gender === 'Male'}
+					{#if viewUser.gender === 'Male'}
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 						<div class="flex flex-row items-center mt-9 mb-2">
@@ -225,7 +206,7 @@
 							<h1 class="font-semibold">Male</h1>
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 						</div>
-					{:else if userNow.gender === 'Female'}
+					{:else if viewUser.gender === 'Female'}
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<div class="flex flex-row items-center mb-2">
 							<img
@@ -237,48 +218,23 @@
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 						</div>
-					{:else}
-						<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-						<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-						<div class="flex flex-row items-center mb-2">
-							<h1 class="font-semibold">Gender is undefined</h1>
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<img
-								src="https://rxkhdqhbxkogcnbfvquu.supabase.co/storage/v1/object/public/statics/edit-svgrepo-com.svg"
-								alt="Bout us"
-								class="rounded-full w-6 h-6 object-cover hover:rotate-12"
-								on:click={addgenderModal}
-							/>
-						</div>
 					{/if}
-					{#if userNow.dob}
+					{#if viewUser.dob}
 						<div class="flex flex-row items-center mb-2">
 							<img
 								src="https://rxkhdqhbxkogcnbfvquu.supabase.co/storage/v1/object/public/statics/date-question-svgrepo-com.svg"
 								alt="age"
 								class="rounded-full w-7 h-7 mr-2 object-cover"
 							/>
-							<h1 class="font-semibold">Age: {calculateAge(userNow.dob)}</h1>
+							<h1 class="font-semibold">Age: {calculateAge(viewUser.dob)}</h1>
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-							<img
-								src="https://rxkhdqhbxkogcnbfvquu.supabase.co/storage/v1/object/public/statics/edit-svgrepo-com.svg"
-								alt="Bout us"
-								class="mx-2 rounded-full w-5 h-5 object-cover rotate-45 hover:scale-105"
-								on:click={adddobModal}
-							/>
 						</div>
 					{:else}
 						<div class="mb-2 flex flex-row items-center">
 							<h1 class="font-semibold">Age is undefined</h1>
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-							<img
-								src="https://rxkhdqhbxkogcnbfvquu.supabase.co/storage/v1/object/public/statics/edit-svgrepo-com.svg"
-								alt="Bout us"
-								class="rounded-full w-5 h-5 object-cover hover:rotate-12"
-								on:click={adddobModal}
-							/>
 						</div>
 					{/if}
 					<!-- <div class="flex flex-row space-x-2 mt-9 mb-2">
@@ -297,79 +253,12 @@
 							alt="User Image"
 							class="w-5 h-5 mr-3 hover:scale-105 hover:rotate-12"
 						/>
-						<h1>{userNow.email}</h1>
+						<h1>{viewUser.email}</h1>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-	{#if picModal}
-		<div
-			class="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 transition-opacity backdrop-blur-sm"
-		>
-			<div class=" p-6 rounded-lg shadow-lg max-w-md w-full m-4 bg-white">
-				<div class="flex justify-between items-center mb-4">
-					<h2 class="text-2xl font-bold">Add a new Profile picture</h2>
-					<button class=" text-lg" on:click={closepicModal}>&times;</button>
-				</div>
-
-				<form
-					use:enhance
-					action="?/addPic"
-					method="POST"
-					enctype="multipart/form-data"
-					on:submit={() => {
-						closepicModal();
-					}}
-				>
-					<div class="flex flex-col space-y-6">
-						<label class="label flex items-center">
-							<span class="font-bold">Photo</span>
-
-							<input class="input h-8" type="file" id="pic" name="pic" bind:value={pic} />
-						</label>
-						<button type="submit" class="btn variant-filled-primary text-xl font-semibold">
-							Submit
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	{/if}
-
-	{#if dobModal}
-		<div
-			class="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50 transition-opacity backdrop-blur-sm"
-		>
-			<div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full m-4">
-				<div class="flex justify-between items-center mb-4">
-					<h2 class="text-2xl font-bold">Date of Birth</h2>
-					<button class=" text-lg" on:click={closedobModal}>&times;</button>
-				</div>
-
-				<form
-					use:enhance
-					action="?/addDob"
-					method="POST"
-					on:submit={() => {
-						closedobModal();
-					}}
-				>
-					<div class="flex flex-col space-y-6">
-						<label class="label text-left mb-3">
-							<span class="font-bold">Date of Birth</span>
-
-							<input class="input" type="date" id="dob" name="dob" bind:value={dob} />
-						</label>
-						<button type="submit" class="btn variant-filled-primary text-xl font-semibold">
-							Submit
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	{/if}
 </section>
 
 <style>

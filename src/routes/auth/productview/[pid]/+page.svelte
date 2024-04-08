@@ -33,21 +33,20 @@
 	function addReviewModel() {
 		showaddmodal = true;
 		console.log('click new class');
-		console.log(groupedReviews)
+		console.log(groupedReviews);
 	}
 	function closeReviewModel() {
 		showaddmodal = false;
 	}
 
 	let showReview = false;
-	const checkReviews = ()=>{
+	const checkReviews = () => {
 		showReview = true;
-	}
-	const closeReviews = ()=>{
+	};
+	const closeReviews = () => {
 		showReview = false;
-	}
+	};
 
-	
 	let chart = null; // This will hold the chart instance
 	let chartContainer;
 
@@ -204,7 +203,7 @@
 					</div>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<div
-						class="flex flex-row space-x-3 px-2 items-center justify-center  border-[2px] border-black hover:scale-105 hover:bg-gray-100"
+						class="flex flex-row space-x-3 px-2 items-center justify-center border-[2px] border-black hover:scale-105 hover:bg-gray-100"
 						on:click={addReviewModel}
 					>
 						<!-- <img
@@ -227,7 +226,9 @@
 				</div>
 
 				<a href={item.payload.Link}>
-					<p class="text-[66px] hover:scale-x-105 leading-0 font-bold leading-tight">{item.payload.Name}</p>
+					<p class="text-[66px] hover:scale-x-105 leading-0 font-bold leading-tight">
+						{item.payload.Name}
+					</p>
 				</a>
 				<p>
 					<span class="font-semibold">Category &gt</span>
@@ -269,64 +270,118 @@
 				</div>
 				{#if isOpenReview}
 					<div class="text-[23px] ml-4 text-justify text-[#5a5a59]">
-						{#if Object.keys(groupedReviews).length!==0}
+						{#if Object.keys(groupedReviews).length !== 0}
 							<div class="flex justify-center items-center w-full">
 								<div class="h-[300px]">
 									<canvas bind:this={chartContainer}></canvas>
-								</div> 
+								</div>
 								<div>
 									{#if !showReview}
-									<button on:click={checkReviews} class="px-4 m-4 py-2 border-[2px] border-black hover:scale-105">Check Reviews</button>	
+										<button
+											on:click={checkReviews}
+											class="px-4 m-4 py-2 border-[2px] border-black hover:scale-105"
+											>Check Reviews</button
+										>
 									{:else}
-									<button on:click={closeReviews} class="px-4 m-4 py-2 border-[2px] border-black hover:scale-105">Close</button>	
+										<button
+											on:click={closeReviews}
+											class="px-4 m-4 py-2 border-[2px] border-black hover:scale-105">Close</button
+										>
 									{/if}
 								</div>
-								
 							</div>
 							{#if showReview}
-									<div class="bg-[#fcfcfc] my-2 p-4 border-[2px] border-black shadow-lg w-full dark:bg-[#212020] h-[300px] overflow-y-scroll scroll">
-										
-										<div class="">
-											<div class="m-4 border-b-[2px] border-black">
-												<p class="text-[26px] underline font-bold">Positive</p>
-												<ul>
-													{#if 'positive' in groupedReviews}
-														{#each groupedReviews.positive as review}
-															<li>
-																-{review.body}
-															</li>
-														{/each}
-													{/if}
-												</ul>
-											</div>
-											<div class="m-4 border-b-[2px] border-black">
-												<p class="text-[26px] underline font-bold">Negative</p>
-												<ul>
-													{#if 'negative' in groupedReviews}
-														{#each groupedReviews.negative as review}
-															<li>
-																-{review.body}
-															</li>
-														{/each}
-													{/if}
-												</ul>
-											</div>
-											<div class="m-4 ">
-												<p class="text-[26px] underline font-bold">Neutral</p>
-												<ul>
-													{#if 'neutral' in groupedReviews}
-														{#each groupedReviews.neutral as review}
-															<li>
-																-{review.body}
-															</li>
-														{/each}
-													{/if}
-												</ul>
-					
-											</div>
+								<div
+									class="bg-[#fcfcfc] my-2 p-4 border-[2px] border-black shadow-lg w-full dark:bg-[#212020] h-[300px] overflow-y-scroll scroll"
+								>
+									<div class="">
+										<div class="m-4 border-b-[2px] border-black">
+											<p class="text-[26px] underline font-bold">Positive</p>
+											<ul>
+												{#if 'positive' in groupedReviews}
+													{#each groupedReviews.positive as review}
+														<li>
+															<a
+																href="/auth/publicview/{review.user.id}"
+																class="flex flex-row space-x-2"
+															>
+																<img
+																	scr={review.user.image}
+																	alt="commenter"
+																	class="w-6 h-6 rounded-full"
+																/>
+																<p class="font-semibold">
+																	{review.user.name}
+																</p>
+															</a>
+															<p class="font-semibold">
+																{review.body}
+															</p>
+															<!-- -{review.body} -->
+														</li>
+													{/each}
+												{/if}
+											</ul>
 										</div>
-									</div> 
-								{/if}
+										<div class="m-4 border-b-[2px] border-black">
+											<p class="text-[26px] underline font-bold">Negative</p>
+											<ul>
+												{#if 'negative' in groupedReviews}
+													{#each groupedReviews.negative as review}
+														<li>
+															<a
+																href="/auth/publicview/{review.user.id}"
+																class="flex flex-row space-x-2"
+															>
+																<img
+																	scr={review.user.image}
+																	alt="commenter"
+																	class="w-6 h-6 rounded-full"
+																/>
+																<p class="font-semibold">
+																	{review.user.name}
+																</p>
+															</a>
+															<p class="font-semibold">
+																{review.body}
+															</p>
+															<!-- -{review.body} -->
+														</li>
+													{/each}
+												{/if}
+											</ul>
+										</div>
+										<div class="m-4">
+											<p class="text-[26px] underline font-bold">Neutral</p>
+											<ul>
+												{#if 'neutral' in groupedReviews}
+													{#each groupedReviews.neutral as review}
+														<li>
+															<a
+																href="/auth/publicview/{review.user.id}"
+																class="flex flex-row space-x-2"
+															>
+																<img
+																	scr={review.user.image}
+																	alt="commenter"
+																	class="w-6 h-6 rounded-full"
+																/>
+																<p class="font-semibold">
+																	{review.user.name}
+																</p>
+															</a>
+															<p class="font-semibold">
+																{review.body}
+															</p>
+															<!-- -{review.body} -->
+														</li>
+													{/each}
+												{/if}
+											</ul>
+										</div>
+									</div>
+								</div>
+							{/if}
 						{:else}
 							<p>No reviews Yet</p>
 						{/if}
@@ -420,17 +475,19 @@
 		</div>
 		{#if showaddmodal}
 			<div
-				class="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center z-50 transition-opacity "
+				class="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center z-50 transition-opacity"
 			>
-				<div class="bg-[#f9f7f7] p-4 border-[2px] border-black shadow-lg max-w-md w-full dark:bg-[#212020]">
-					<div class="flex w-full  justify-between items-center mb-3">
+				<div
+					class="bg-[#f9f7f7] p-4 border-[2px] border-black shadow-lg max-w-md w-full dark:bg-[#212020]"
+				>
+					<div class="flex w-full justify-between items-center mb-3">
 						<h2 class="text-2xl font-bold ml-5">Add a Review</h2>
 						<button class=" text-lg" on:click={closeReviewModel}>&times;</button>
 					</div>
 
 					<form
 						use:enhance
-						class="flex flex-col items-center justify-center  w-full"
+						class="flex flex-col items-center justify-center w-full"
 						action="?/review"
 						method="POST"
 						on:submit={() => {
@@ -448,10 +505,10 @@
 									bind:value={body}
 								/>
 							</label>
-							<div class="flex justify-end items-center  w-full">
+							<div class="flex justify-end items-center w-full">
 								<button
 									type="submit"
-									class=" text-xl px-4 py-2 m-2 font-semibold dark:text-[#e1e1e1]  bg-white border-[2px] border-black shadow-md hover:scale-105  dark:hover:bg-[#efefef]"
+									class=" text-xl px-4 py-2 m-2 font-semibold dark:text-[#e1e1e1] bg-white border-[2px] border-black shadow-md hover:scale-105 dark:hover:bg-[#efefef]"
 								>
 									Submit
 								</button>
@@ -461,8 +518,6 @@
 				</div>
 			</div>
 		{/if}
-
-		
 	</div>
 
 	<!-- related product -->
@@ -530,7 +585,7 @@
 		</section>
 	</div>
 </div>
-
+<pre>{JSON.stringify(groupedReviews, null, 2)}</pre>
 
 <style>
 	.links {

@@ -83,7 +83,13 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
         .eq('pid', prid)
 
     // print(reviews)
-
+    for (let i = 0; i < reviews?.length; i++) {
+        let { data: userComment, error: err77 } = await supabase
+            .from('userdetails')
+            .select("*")
+            .eq('id', reviews[i].uid)
+        reviews[i].user = userComment[0];
+    }
     let groupedReviews = {};
 
 

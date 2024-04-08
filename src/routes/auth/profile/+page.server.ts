@@ -22,6 +22,13 @@ export const load = async ({ locals: { supabase, getSession } }) => {
     console.log(err);
     userNow = userdetails[0];
 
+    let { data: cart, error: err25 } = await supabase
+        .from('cart')
+        .select("*")
+        .eq('uid', userNow.id)
+
+    let itemCount = cart?.length;
+
 
     // let { data: past, error: err2 } = await supabase
     //     .from('past')
@@ -47,7 +54,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
     //     .eq('userid', userNow.id)
 
 
-    return { userNow };
+    return { userNow, itemCount };
 }
 
 export const actions = {

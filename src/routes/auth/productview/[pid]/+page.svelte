@@ -488,7 +488,7 @@
 					<form
 						use:enhance
 						class="flex flex-col items-center justify-center w-full"
-						action="?/review"
+						action="?/review&id={item.id}"
 						method="POST"
 						on:submit={() => {
 							closeReviewModel();

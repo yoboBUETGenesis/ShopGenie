@@ -132,8 +132,9 @@ export const actions = {
 
         else throw redirect(303, `/auth/productview/${proid}`);
     },
-    review: async ({ request, locals: { supabase, getSession } }) => {
+    review: async ({ url, request, locals: { supabase, getSession } }) => {
         const data = await request.formData();
+        const proid = url.searchParams.get("id")
         //console.log("amar add class form holo", data);
 
         let newReview = Object.fromEntries(data.entries()) as any;
@@ -164,13 +165,13 @@ export const actions = {
         const { data: dtt, error: err } = await supabase
             .from('review')
             .insert([
-                { uid: userNow.id, pid: prid, body: newReview.body, sentiment: result },
+                { uid: userNow.id, pid: proid, body: newReview.body, sentiment: result },
             ])
             .select()
 
         if (err) console.log(err)
 
-        else throw redirect(303, `/auth/productview/${prid}`);
+        else throw redirect(303, `/auth/productview/${proid}`);
 
     },
 

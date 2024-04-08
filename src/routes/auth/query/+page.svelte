@@ -301,25 +301,63 @@
 		// openAIresult = true;
 	}
 	let submissionDone = false;
+	let submissionDonButLoading = false;
 
 	async function finalSubmit() {
 		submissionDone = true;
+		submissionDonButLoading = true;
 		if (textquery.length > 0) {
 			if (recognizedSpeech.length > 0 && image != null) {
 				// text + audio + image
-				const concatanated = textquery + recognizedSpeech;
-			} else if (recognizedSpeech.length > 0) {
-				//can be taken only text
-				const concatanated = textquery + recognizedSpeech;
-				let payload = { text: concatanated };
+				const concatanated = textquery + ' ' + recognizedSpeech;
+				const formData1 = new FormData();
+				const formData2 = new FormData();
+
+				// formData1.append('imageLink', imageUploaded);
+
+				formData2.append('imageLink', imageUploaded);
+				formData2.append('requirement', concatanated);
+				// const ret = await fetch('/api/image-shortSearch', {
+				// 	method: 'POST',
+				// 	body: formData1
+				// });
+				// const res = await ret.json();
+				// searchResult = res['list'];
+
+				const ret_des = await fetch('/api/new-description', {
+					method: 'POST',
+					body: formData2
+				});
+				const res_des = await ret_des.json();
+
+				const textPrompt = res_des['description'];
+				console.log(textPrompt);
+				// console.log(searchResult);
+
+				let payload = { text: textPrompt };
 				openAIresult = false;
-				const ret = await fetch('/api/summary-search', {
+				const retmod = await fetch('/api/summary-search', {
 					method: 'POST',
 					body: JSON.stringify(payload)
 				});
-				const res = await ret.json();
-				console.log(res);
-				searchResult = res['list'];
+				const resmod = await retmod.json();
+				// console.log(res);
+				searchResult = resmod['list'];
+				submissionDonButLoading = false;
+
+				// for (let i = 0; i < resmod['list'].length; i++) {
+				// 	let existsm = false;
+				// 	for (let j = 0; j < searchResult.length; j++) {
+				// 		if (resmod['list'][i].id == searchResult[j].id) {
+				// 			existsm = true;
+				// 			break;
+				// 		}
+				// 	}
+				// 	if (existsm == false) {
+				// 		searchResult.push(resmod['list'][i]);
+				// 	}
+				// }
+
 				context = '';
 				for (let i = 0; i < searchResult.length; i++) {
 					context += 'id: ';
@@ -334,7 +372,79 @@
 						'. ' +
 						searchResult[i].payload.Description +
 						'. Price' +
-						searchResult[i].payload.Price;
+						searchResult[i].payload.Price +
+						'. Specifications: ' +
+						searchResult[i].payload.Specifications;
+					context += '\n';
+				}
+				console.log(context);
+				let payload2 = { text: context, query: textPrompt };
+				console.log(context);
+
+				const ret2 = await fetch('/api/sort-embed', {
+					method: 'POST',
+					body: JSON.stringify(payload2)
+				});
+
+				const res2 = await ret2.json();
+				console.log(res2['text']);
+				let strTmp = '';
+				let ok = false;
+				for (let i = 0; i < res2['text'].length; i++) {
+					if (res2['text'][i] == '[') {
+						ok = true;
+					} else if (res2['text'][i] == ']') {
+						strTmp += res2['text'][i];
+						ok = false;
+						break;
+					}
+					if (ok) {
+						strTmp += res2['text'][i];
+					}
+				}
+				const finlList = JSON.parse(strTmp);
+				// console.log(res2['text']);
+				let tempo = [];
+				for (let i = 0; i < finlList.length; i++) {
+					for (let j = 0; j < searchResult.length; j++) {
+						if (searchResult[j].id == finlList[i]) {
+							tempo.push(searchResult[j]);
+							break;
+						}
+					}
+				}
+				openAIList = tempo;
+				openAIresult = true;
+			} else if (recognizedSpeech.length > 0) {
+				//can be taken only text
+				const concatanated = textquery + recognizedSpeech;
+				let payload = { text: concatanated };
+				openAIresult = false;
+				const ret = await fetch('/api/summary-search', {
+					method: 'POST',
+					body: JSON.stringify(payload)
+				});
+				const res = await ret.json();
+				console.log(res);
+				searchResult = res['list'];
+				submissionDonButLoading = false;
+				context = '';
+				for (let i = 0; i < searchResult.length; i++) {
+					context += 'id: ';
+					context += searchResult[i].id;
+					context += '. Summary: This is a ';
+					context +=
+						searchResult[i].payload.Category +
+						' from ' +
+						searchResult[i].payload.Company +
+						'. It is a ' +
+						searchResult[i].payload.Name +
+						'. ' +
+						searchResult[i].payload.Description +
+						'. Price' +
+						searchResult[i].payload.Price +
+						'. Specifications: ' +
+						searchResult[i].payload.Specifications;
 					context += '\n';
 				}
 				console.log(context);
@@ -379,6 +489,111 @@
 			} else if (image != null) {
 				//text + image
 				const concatanated = textquery;
+				const formData1 = new FormData();
+				const formData2 = new FormData();
+
+				// formData1.append('imageLink', imageUploaded);
+
+				formData2.append('imageLink', imageUploaded);
+				formData2.append('requirement', concatanated);
+				// const ret = await fetch('/api/image-shortSearch', {
+				// 	method: 'POST',
+				// 	body: formData1
+				// });
+				// const res = await ret.json();
+				// searchResult = res['list'];
+
+				const ret_des = await fetch('/api/new-description', {
+					method: 'POST',
+					body: formData2
+				});
+				const res_des = await ret_des.json();
+
+				const textPrompt = res_des['description'];
+				console.log(textPrompt);
+				// console.log(searchResult);
+
+				let payload = { text: textPrompt };
+				openAIresult = false;
+				const retmod = await fetch('/api/summary-search', {
+					method: 'POST',
+					body: JSON.stringify(payload)
+				});
+				const resmod = await retmod.json();
+				// console.log(res);
+				searchResult = resmod['list'];
+				submissionDonButLoading = false;
+
+				// for (let i = 0; i < resmod['list'].length; i++) {
+				// 	let existsm = false;
+				// 	for (let j = 0; j < searchResult.length; j++) {
+				// 		if (resmod['list'][i].id == searchResult[j].id) {
+				// 			existsm = true;
+				// 			break;
+				// 		}
+				// 	}
+				// 	if (existsm == false) {
+				// 		searchResult.push(resmod['list'][i]);
+				// 	}
+				// }
+
+				context = '';
+				for (let i = 0; i < searchResult.length; i++) {
+					context += 'id: ';
+					context += searchResult[i].id;
+					context += '. Summary: This is a ';
+					context +=
+						searchResult[i].payload.Category +
+						' from ' +
+						searchResult[i].payload.Company +
+						'. It is a ' +
+						searchResult[i].payload.Name +
+						'. ' +
+						searchResult[i].payload.Description +
+						'. Price' +
+						searchResult[i].payload.Price +
+						'. Specifications: ' +
+						searchResult[i].payload.Specifications;
+					context += '\n';
+				}
+				console.log(context);
+				let payload2 = { text: context, query: textPrompt };
+				console.log(context);
+
+				const ret2 = await fetch('/api/sort-embed', {
+					method: 'POST',
+					body: JSON.stringify(payload2)
+				});
+
+				const res2 = await ret2.json();
+				console.log(res2['text']);
+				let strTmp = '';
+				let ok = false;
+				for (let i = 0; i < res2['text'].length; i++) {
+					if (res2['text'][i] == '[') {
+						ok = true;
+					} else if (res2['text'][i] == ']') {
+						strTmp += res2['text'][i];
+						ok = false;
+						break;
+					}
+					if (ok) {
+						strTmp += res2['text'][i];
+					}
+				}
+				const finlList = JSON.parse(strTmp);
+				// console.log(res2['text']);
+				let tempo = [];
+				for (let i = 0; i < finlList.length; i++) {
+					for (let j = 0; j < searchResult.length; j++) {
+						if (searchResult[j].id == finlList[i]) {
+							tempo.push(searchResult[j]);
+							break;
+						}
+					}
+				}
+				openAIList = tempo;
+				openAIresult = true;
 			} else {
 				//only text
 
@@ -392,6 +607,7 @@
 				const res = await ret.json();
 				console.log(res);
 				searchResult = res['list'];
+				submissionDonButLoading = false;
 				context = '';
 				for (let i = 0; i < searchResult.length; i++) {
 					context += 'id: ';
@@ -452,18 +668,134 @@
 			if (recognizedSpeech.length > 0) {
 				//text + image
 				const concatanated = recognizedSpeech;
+				const formData1 = new FormData();
+				const formData2 = new FormData();
+
+				// formData1.append('imageLink', imageUploaded);
+
+				formData2.append('imageLink', imageUploaded);
+				formData2.append('requirement', concatanated);
+				// const ret = await fetch('/api/image-shortSearch', {
+				// 	method: 'POST',
+				// 	body: formData1
+				// });
+				// const res = await ret.json();
+				// searchResult = res['list'];
+
+				const ret_des = await fetch('/api/new-description', {
+					method: 'POST',
+					body: formData2
+				});
+				const res_des = await ret_des.json();
+
+				const textPrompt = res_des['description'];
+				console.log(textPrompt);
+				// console.log(searchResult);
+
+				let payload = { text: textPrompt };
+				openAIresult = false;
+				const retmod = await fetch('/api/summary-search', {
+					method: 'POST',
+					body: JSON.stringify(payload)
+				});
+				const resmod = await retmod.json();
+				// console.log(res);
+				searchResult = resmod['list'];
+				submissionDonButLoading = false;
+
+				// for (let i = 0; i < resmod['list'].length; i++) {
+				// 	let existsm = false;
+				// 	for (let j = 0; j < searchResult.length; j++) {
+				// 		if (resmod['list'][i].id == searchResult[j].id) {
+				// 			existsm = true;
+				// 			break;
+				// 		}
+				// 	}
+				// 	if (existsm == false) {
+				// 		searchResult.push(resmod['list'][i]);
+				// 	}
+				// }
+
+				context = '';
+				for (let i = 0; i < searchResult.length; i++) {
+					context += 'id: ';
+					context += searchResult[i].id;
+					context += '. Summary: This is a ';
+					context +=
+						searchResult[i].payload.Category +
+						' from ' +
+						searchResult[i].payload.Company +
+						'. It is a ' +
+						searchResult[i].payload.Name +
+						'. ' +
+						searchResult[i].payload.Description +
+						'. Price' +
+						searchResult[i].payload.Price +
+						'. Specifications: ' +
+						searchResult[i].payload.Specifications;
+					context += '\n';
+				}
+				console.log(context);
+				let payload2 = { text: context, query: textPrompt };
+				console.log(context);
+
+				const ret2 = await fetch('/api/sort-embed', {
+					method: 'POST',
+					body: JSON.stringify(payload2)
+				});
+
+				const res2 = await ret2.json();
+				console.log(res2['text']);
+				let strTmp = '';
+				let ok = false;
+				for (let i = 0; i < res2['text'].length; i++) {
+					if (res2['text'][i] == '[') {
+						ok = true;
+					} else if (res2['text'][i] == ']') {
+						strTmp += res2['text'][i];
+						ok = false;
+						break;
+					}
+					if (ok) {
+						strTmp += res2['text'][i];
+					}
+				}
+				const finlList = JSON.parse(strTmp);
+				// console.log(res2['text']);
+				let tempo = [];
+				for (let i = 0; i < finlList.length; i++) {
+					for (let j = 0; j < searchResult.length; j++) {
+						if (searchResult[j].id == finlList[i]) {
+							tempo.push(searchResult[j]);
+							break;
+						}
+					}
+				}
+				openAIList = tempo;
+				openAIresult = true;
 			} else {
 				//only image. just roboflow
-				const formData = new FormData();
+				const formData1 = new FormData();
+				const formData2 = new FormData();
 
-				formData.append('imageLink', imageUploaded);
+				formData1.append('imageLink', imageUploaded);
+				formData2.append('imageLink', imageUploaded);
 				const ret = await fetch('/api/image-search', {
 					method: 'POST',
-					body: formData
+					body: formData1
 				});
 				const res = await ret.json();
 				searchResult = res['list'];
+				submissionDonButLoading = false;
 
+				const ret_des = await fetch('/api/image-description', {
+					method: 'POST',
+					body: formData2
+				});
+				const res_des = await ret_des.json();
+
+				const textPrompt = res_des['description'];
+				console.log(textPrompt);
 				console.log(searchResult);
 
 				context = '';
@@ -484,7 +816,7 @@
 					context += '\n';
 				}
 				console.log(context);
-				let payload2 = { text: context, query: textquery };
+				let payload2 = { text: context, query: textPrompt };
 				// console.log(context)
 
 				const ret2 = await fetch('/api/sort-embed', {
@@ -534,6 +866,7 @@
 			const res = await ret.json();
 			console.log(res);
 			searchResult = res['list'];
+			submissionDonButLoading = false;
 			context = '';
 			for (let i = 0; i < searchResult.length; i++) {
 				context += 'id: ';
@@ -795,33 +1128,46 @@
 	<div class="flex flex-col items-center justify-center mb-6">
 		<h2 class="text-2xl font-bold font-serif">Query Summary</h2>
 	</div>
-	<div class="flex flex-row justify-between">
+	<div class="flex flex-row justify-between ml-8 mr-8">
 		{#if textquery.length > 0}
-			<p class="font-semibold p-3">
+			<p class="font-semibold text-xl p-3">
 				Text Input: {textquery}
 			</p>
 		{:else}
-			<p class="font-semibold p-3">No text input</p>
+			<p class="font-semibold text-xl p-3">No text input</p>
 		{/if}
 
 		{#if imageUploaded.length > 0}
 			<img
 				src={imageUploaded}
 				alt="Start"
-				class="cursor-pointer w-1/2 items-center justify-center"
+				class="cursor-pointer w-48 h-48 items-center justify-center"
 			/>
 		{:else}
-			<p class="font-semibold p-3">No Image input</p>
+			<p class="font-semibold text-xl p-3">No Image input</p>
 		{/if}
 
 		{#if recognizedSpeech.length > 0}
-			<p class="font-semibold p-3">
+			<p class="font-semibold text-xl p-3">
 				Audio Input: {recognizedSpeech}
 			</p>
 		{:else}
-			<p class="font-semibold p-3">No Audio input</p>
+			<p class="font-semibold text-xl p-3">No Audio input</p>
 		{/if}
 	</div>
+	{#if submissionDonButLoading}
+		<div class="flex flex-col items-center justify-center mt-4">
+			<div
+				class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+				role="status"
+			>
+				<span
+					class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+					>Searching Veactor database For Relevant results...</span
+				>
+			</div>
+		</div>
+	{/if}
 {:else}
 	<div class="p-6 rounded-lg w-full m-4 dark:bg-[#212020]">
 		<div class="flex flex-col justify-center items-center mb-3">
@@ -876,14 +1222,16 @@
 					</button>
 				</form>
 				{#if imageuploading}
-					<div
-						class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
-						role="status"
-					>
-						<span
-							class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-							>Loading...</span
+					<div class="flex flex-col items-center justify-center mt-4">
+						<div
+							class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+							role="status"
 						>
+							<span
+								class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+								>Loading...</span
+							>
+						</div>
 					</div>
 				{:else if imageUploaded.length > 0}
 					<div class="flex flex-col space-y-3 mt-4">
@@ -953,20 +1301,18 @@
 {/if}
 
 {#if searchResult.length > 0}
-	{#if openAIresult}
-		<h1 class="font-bold ml-10">OpenAI Has Analysed. Here are the most Relevant search results</h1>
-	{:else}
-		<h1 class="font-bold ml-10">Showing result fetched from Qdrant. OpenAI analysing..</h1>
-	{/if}
-	<!-- <div class="toggle-container ml-10 mt-10">
-		<button on:click={() => (showOpenAIResults = !showOpenAIResults)} class="btn">
-			{#if showOpenAIResults}
-				Show Text Results
-			{:else}
-				Show OpenAI Results
-			{/if}
-		</button>
-	</div> -->
+	<div class="ml-10 mt-10 flex flex-col items-center justify-center text-center">
+		{#if openAIresult}
+			<h1 class="font-bold text-2xl font-sans">
+				OpenAI Has Analysed. You Can see the Most Relevant search results
+			</h1>
+		{:else}
+			<h1 class="font-bold text-2xl font-sans">
+				Showing result fetched from Qdrant. OpenAI analysing..
+			</h1>
+		{/if}
+	</div>
+
 	<div class="flex items-center ml-10 mt-10">
 		<label for="toggleB" class="flex items-center cursor-pointer">
 			<!-- toggle -->
@@ -987,7 +1333,7 @@
 			</div>
 			<!-- label -->
 			<div class="ml-3 text-gray-700 font-medium">
-				{showOpenAIResults ? 'OpenAI Results' : 'Text Results'}
+				{showOpenAIResults ? 'OpenAI Results' : 'Vector Database Results'}
 			</div>
 		</label>
 	</div>

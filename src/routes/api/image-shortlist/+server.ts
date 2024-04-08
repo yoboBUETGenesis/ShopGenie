@@ -1,3 +1,4 @@
+// image-shortlist
 import * as dotenv from 'dotenv';
 import OpenAI from 'openai';
 import { QdrantClient } from '@qdrant/js-client-rest';
@@ -40,7 +41,7 @@ export const POST = (async ({ request }) => {
 		params: {
 			ef: 128
 		},
-		limit: 7,
+		limit: 5,
 		with_payload: true,
 		with_vector: false
 	});
@@ -56,7 +57,7 @@ export const POST = (async ({ request }) => {
 		params: {
 			ef: 128
 		},
-		limit: 7,
+		limit: 5,
 		with_payload: true,
 		with_vector: false
 	});

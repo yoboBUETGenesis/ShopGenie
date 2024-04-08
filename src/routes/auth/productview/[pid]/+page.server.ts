@@ -83,6 +83,7 @@ export const load = async ({ params, locals: { supabase, getSession } }) => {
         .eq('pid', prid)
 
     // print(reviews)
+
     let groupedReviews = {};
 
 

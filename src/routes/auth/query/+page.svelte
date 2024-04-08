@@ -1,6 +1,8 @@
 <script lang="ts">
 	import aarongimage from '$lib/images/Aarong Logo Vector.svg';
-
+	import start from '$lib/images/start_rec.svg';
+	import stop from '$lib/images/stop.svg';
+	import stopdisabled from '$lib/images/stop_disabled.svg';
 	import allen from '$lib/images/Allen.svg';
 	import apex from '$lib/images/apex.png';
 	import genie from '$lib/images/genie.png';
@@ -9,55 +11,96 @@
 	import { onMount } from 'svelte';
 	import { json } from '@sveltejs/kit';
 	// import { Pulse } from 'svelte-loading-spinners';
+	import { writable } from 'svelte/store';
 
 	let recognizedSpeech = '';
-	let hearingRunning = false;
-	let mediaRecorder: any;
-	let chunks: any[] = [];
+	let audioURL = '';
+	const hearingRunning = writable(false);
+	let mediaRecorder: MediaRecorder | null = null;
+	let audioBlob: Blob;
+	let chunks: BlobPart[] = [];
 
-	function handleHearingStart() {
-		hearingRunning = true;
-		startRecording();
-	}
-
-	function handleHearingStop() {
-		stopRecording();
-		hearingRunning = false;
-	}
 	async function startRecording() {
+		if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+			console.error('Media Devices not supported');
+			return;
+		}
+
+		hearingRunning.set(true);
 		chunks = [];
-		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-		mediaRecorder = new MediaRecorder(stream);
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch((err) => {
+			console.error('Failed to get user media', err);
+			hearingRunning.set(false);
+		});
 
-		mediaRecorder.ondataavailable = function (e) {
-			chunks.push(e.data);
-		};
+		if (stream) {
+			mediaRecorder = new MediaRecorder(stream);
 
-		// mediaRecorder.onstop = async function () {
-		// const blob = await new Blob(chunks, { type: 'audio/mp3' });
-		// const recordedAudioFile = await new File([blob], 'recorded_audio.mp3', { type: 'audio/mp3' });
-		// console.log(recordedAudioFile)
+			mediaRecorder.ondataavailable = function (e) {
+				chunks.push(e.data);
+			};
 
-		// const formData = new FormData();
-		// formData.append('audioFile', recordedAudioFile);
+			mediaRecorder.onstop = () => {
+				audioBlob = new Blob(chunks, { type: 'audio/webm' });
+				audioURL = URL.createObjectURL(audioBlob);
+			};
 
-		// const ret = await fetch('/api/transcribe', {
-		// 	method: 'POST',
-		// 	body: formData
-		// });
-
-		// const res = await ret.json();
-		// recognizedSpeech = res['text'];
-
-		// chunks = [];
-		// };
-
-		mediaRecorder.start();
+			mediaRecorder.start();
+		}
 	}
-
 	function stopRecording() {
-		mediaRecorder.stop();
+		mediaRecorder?.stop();
+		hearingRunning.set(false);
 	}
+
+	// let recognizedSpeech = '';
+	// let hearingRunning = false;
+	// let mediaRecorder: any;
+	// let chunks: any[] = [];
+
+	// function handleHearingStart() {
+	// 	hearingRunning = true;
+	// 	startRecording();
+	// }
+
+	// function handleHearingStop() {
+	// 	stopRecording();
+	// 	hearingRunning = false;
+	// }
+	// async function startRecording() {
+	// 	chunks = [];
+	// 	const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+	// 	mediaRecorder = new MediaRecorder(stream);
+
+	// 	mediaRecorder.ondataavailable = function (e) {
+	// 		chunks.push(e.data);
+	// 	};
+
+	// 	// mediaRecorder.onstop = async function () {
+	// 	// const blob = await new Blob(chunks, { type: 'audio/mp3' });
+	// 	// const recordedAudioFile = await new File([blob], 'recorded_audio.mp3', { type: 'audio/mp3' });
+	// 	// console.log(recordedAudioFile)
+
+	// 	// const formData = new FormData();
+	// 	// formData.append('audioFile', recordedAudioFile);
+
+	// 	// const ret = await fetch('/api/transcribe', {
+	// 	// 	method: 'POST',
+	// 	// 	body: formData
+	// 	// });
+
+	// 	// const res = await ret.json();
+	// 	// recognizedSpeech = res['text'];
+
+	// 	// chunks = [];
+	// 	// };
+
+	// 	mediaRecorder.start();
+	// }
+
+	// function stopRecording() {
+	// 	mediaRecorder.stop();
+	// }
 
 	onMount(() => {});
 
@@ -73,7 +116,7 @@
 	};
 
 	let image: any;
-	let textquery: string;
+	let textquery: string = '';
 	let audio;
 	let showaddmodal = true;
 
@@ -95,93 +138,92 @@
 	// 	form?.success = "";
 	// }
 
-	let searchResult: any = []
+	let searchResult: any = [];
 	let context = '';
 	let openAIresult = false;
 	let openAIList: any = [];
 	let showOpenAIResults = false;
+	let textDoneSubmitted = false;
 
 	async function textSubmit() {
+		textDoneSubmitted = true;
 		// console.log(textquery);
-		let payload = { text: textquery };
-		openAIresult = false;
-		// console.log(payload)
-
-		// console.log("Here")
-		const ret = await fetch('/api/summary-search', {
-			method: 'POST',
-			body: JSON.stringify(payload)
-		});
-		// console.log(ret)
-
-		const res = await ret.json();
-		console.log(res);
-
-		searchResult = res['list'];
-
-		context = '';
-		for (let i = 0; i < searchResult.length; i++) {
-			context += 'id: ';
-			context += searchResult[i].id;
-			context += '. Summary: This is a ';
-			context +=
-				searchResult[i].payload.Category +
-				' from ' +
-				searchResult[i].payload.Company +
-				'. It is a ' +
-				searchResult[i].payload.Name +
-				'. ' +
-				searchResult[i].payload.Description +
-				'. Price' +
-				searchResult[i].payload.Price;
-			context += '\n';
-		}
-		console.log(context);
-		let payload2 = { text: context, query: textquery };
-		// console.log(context)
-
-		const ret2 = await fetch('/api/sort-embed', {
-			method: 'POST',
-			body: JSON.stringify(payload2)
-		});
-
-		const res2 = await ret2.json();
-		console.log(res2['text']);
-		let strTmp = '';
-		let ok = false;
-		for (let i = 0; i < res2['text'].length; i++) {
-			if (res2['text'][i] == '[') {
-				ok = true;
-			} else if (res2['text'][i] == ']') {
-				strTmp += res2['text'][i];
-				ok = false;
-				break;
-			}
-			if (ok) {
-				strTmp += res2['text'][i];
-			}
-		}
-		const finlList = JSON.parse(strTmp);
+		// let payload = { text: textquery };
+		// openAIresult = false;
+		// // console.log(payload)
+		// // console.log("Here")
+		// const ret = await fetch('/api/summary-search', {
+		// 	method: 'POST',
+		// 	body: JSON.stringify(payload)
+		// });
+		// // console.log(ret)
+		// const res = await ret.json();
+		// console.log(res);
+		// searchResult = res['list'];
+		// context = '';
+		// for (let i = 0; i < searchResult.length; i++) {
+		// 	context += 'id: ';
+		// 	context += searchResult[i].id;
+		// 	context += '. Summary: This is a ';
+		// 	context +=
+		// 		searchResult[i].payload.Category +
+		// 		' from ' +
+		// 		searchResult[i].payload.Company +
+		// 		'. It is a ' +
+		// 		searchResult[i].payload.Name +
+		// 		'. ' +
+		// 		searchResult[i].payload.Description +
+		// 		'. Price' +
+		// 		searchResult[i].payload.Price;
+		// 	context += '\n';
+		// }
+		// console.log(context);
+		// let payload2 = { text: context, query: textquery };
+		// // console.log(context)
+		// const ret2 = await fetch('/api/sort-embed', {
+		// 	method: 'POST',
+		// 	body: JSON.stringify(payload2)
+		// });
+		// const res2 = await ret2.json();
 		// console.log(res2['text']);
-		let tempo = [];
-		for (let i = 0; i < finlList.length; i++) {
-			for (let j = 0; j < searchResult.length; j++) {
-				if (searchResult[j].id == finlList[i]) {
-					tempo.push(searchResult[j]);
-					break;
-				}
-			}
-		}
-		openAIList = tempo;
-		openAIresult = true;
-
-		// console.log("Here")
-		textquery = '';
+		// let strTmp = '';
+		// let ok = false;
+		// for (let i = 0; i < res2['text'].length; i++) {
+		// 	if (res2['text'][i] == '[') {
+		// 		ok = true;
+		// 	} else if (res2['text'][i] == ']') {
+		// 		strTmp += res2['text'][i];
+		// 		ok = false;
+		// 		break;
+		// 	}
+		// 	if (ok) {
+		// 		strTmp += res2['text'][i];
+		// 	}
+		// }
+		// const finlList = JSON.parse(strTmp);
+		// // console.log(res2['text']);
+		// let tempo = [];
+		// for (let i = 0; i < finlList.length; i++) {
+		// 	for (let j = 0; j < searchResult.length; j++) {
+		// 		if (searchResult[j].id == finlList[i]) {
+		// 			tempo.push(searchResult[j]);
+		// 			break;
+		// 		}
+		// 	}
+		// }
+		// openAIList = tempo;
+		// openAIresult = true;
+		// // console.log("Here")
+		// textquery = '';
 	}
 
+	let imageuploading = false;
+	let imageUploaded = '';
 	async function imageSubmit(event: Event) {
 		const formData = new FormData(event.target as HTMLFormElement);
 		let name = Date.now() + '_' + userNow.id;
+		imageuploading = true;
+		imageUploaded = false;
 		await data.supabase.storage.from('imageqwery').upload(name, formData.get('image'), {
 			cacheControl: '3600',
 			upsert: false
@@ -189,158 +231,471 @@
 
 		const { data: link } = await supabase.storage.from('imageqwery').getPublicUrl(name);
 		// console.log(link.publicUrl);
+		imageUploaded = link.publicUrl;
+		imageuploading = false;
 
-		formData.append('imageLink', link.publicUrl);
-		const ret = await fetch('/api/image-search', {
-			method: 'POST',
-			body: formData
-		});
-		const res = await ret.json();
-		searchResult = res['list'];
+		// formData.append('imageLink', link.publicUrl);
+		// const ret = await fetch('/api/image-search', {
+		// 	method: 'POST',
+		// 	body: formData
+		// });
+		// const res = await ret.json();
+		// searchResult = res['list'];
 
-		console.log(searchResult);
+		// console.log(searchResult);
 
-		context = '';
-		for (let i = 0; i < searchResult.length; i++) {
-			context += 'id: ';
-			context += searchResult[i].id;
-			context += '. Summary: This is a ';
-			context +=
-				searchResult[i].payload.Category +
-				' from ' +
-				searchResult[i].payload.Company +
-				'. It is a ' +
-				searchResult[i].payload.Name +
-				'. ' +
-				searchResult[i].payload.Description +
-				'. Price' +
-				searchResult[i].payload.Price;
-			context += '\n';
-		}
-		console.log(context);
-		let payload2 = { text: context, query: textquery };
-		// console.log(context)
+		// context = '';
+		// for (let i = 0; i < searchResult.length; i++) {
+		// 	context += 'id: ';
+		// 	context += searchResult[i].id;
+		// 	context += '. Summary: This is a ';
+		// 	context +=
+		// 		searchResult[i].payload.Category +
+		// 		' from ' +
+		// 		searchResult[i].payload.Company +
+		// 		'. It is a ' +
+		// 		searchResult[i].payload.Name +
+		// 		'. ' +
+		// 		searchResult[i].payload.Description +
+		// 		'. Price' +
+		// 		searchResult[i].payload.Price;
+		// 	context += '\n';
+		// }
+		// console.log(context);
+		// let payload2 = { text: context, query: textquery };
+		// // console.log(context)
 
-		const ret2 = await fetch('/api/sort-embed', {
-			method: 'POST',
-			body: JSON.stringify(payload2)
-		});
+		// const ret2 = await fetch('/api/sort-embed', {
+		// 	method: 'POST',
+		// 	body: JSON.stringify(payload2)
+		// });
 
-		const res2 = await ret2.json();
-		console.log(res2['text']);
-		let strTmp = '';
-		let ok = false;
-		for (let i = 0; i < res2['text'].length; i++) {
-			if (res2['text'][i] == '[') {
-				ok = true;
-			} else if (res2['text'][i] == ']') {
-				strTmp += res2['text'][i];
-				ok = false;
-				break;
-			}
-			if (ok) {
-				strTmp += res2['text'][i];
-			}
-		}
-		const finlList = JSON.parse(strTmp);
+		// const res2 = await ret2.json();
 		// console.log(res2['text']);
-		let tempo = [];
-		for (let i = 0; i < finlList.length; i++) {
-			for (let j = 0; j < searchResult.length; j++) {
-				if (searchResult[j].id == finlList[i]) {
-					tempo.push(searchResult[j]);
+		// let strTmp = '';
+		// let ok = false;
+		// for (let i = 0; i < res2['text'].length; i++) {
+		// 	if (res2['text'][i] == '[') {
+		// 		ok = true;
+		// 	} else if (res2['text'][i] == ']') {
+		// 		strTmp += res2['text'][i];
+		// 		ok = false;
+		// 		break;
+		// 	}
+		// 	if (ok) {
+		// 		strTmp += res2['text'][i];
+		// 	}
+		// }
+		// const finlList = JSON.parse(strTmp);
+		// // console.log(res2['text']);
+		// let tempo = [];
+		// for (let i = 0; i < finlList.length; i++) {
+		// 	for (let j = 0; j < searchResult.length; j++) {
+		// 		if (searchResult[j].id == finlList[i]) {
+		// 			tempo.push(searchResult[j]);
+		// 			break;
+		// 		}
+		// 	}
+		// }
+		// openAIList = tempo;
+		// openAIresult = true;
+	}
+	let submissionDone = false;
+
+	async function finalSubmit() {
+		submissionDone = true;
+		if (textquery.length > 0) {
+			if (recognizedSpeech.length > 0 && image != null) {
+				// text + audio + image
+				const concatanated = textquery + recognizedSpeech;
+			} else if (recognizedSpeech.length > 0) {
+				//can be taken only text
+				const concatanated = textquery + recognizedSpeech;
+				let payload = { text: concatanated };
+				openAIresult = false;
+				const ret = await fetch('/api/summary-search', {
+					method: 'POST',
+					body: JSON.stringify(payload)
+				});
+				const res = await ret.json();
+				console.log(res);
+				searchResult = res['list'];
+				context = '';
+				for (let i = 0; i < searchResult.length; i++) {
+					context += 'id: ';
+					context += searchResult[i].id;
+					context += '. Summary: This is a ';
+					context +=
+						searchResult[i].payload.Category +
+						' from ' +
+						searchResult[i].payload.Company +
+						'. It is a ' +
+						searchResult[i].payload.Name +
+						'. ' +
+						searchResult[i].payload.Description +
+						'. Price' +
+						searchResult[i].payload.Price;
+					context += '\n';
+				}
+				console.log(context);
+				let payload2 = { text: context, query: textquery };
+				// console.log(context)
+				const ret2 = await fetch('/api/sort-embed', {
+					method: 'POST',
+					body: JSON.stringify(payload2)
+				});
+				const res2 = await ret2.json();
+				console.log(res2['text']);
+				let strTmp = '';
+				let ok = false;
+				for (let i = 0; i < res2['text'].length; i++) {
+					if (res2['text'][i] == '[') {
+						ok = true;
+					} else if (res2['text'][i] == ']') {
+						strTmp += res2['text'][i];
+						ok = false;
+						break;
+					}
+					if (ok) {
+						strTmp += res2['text'][i];
+					}
+				}
+				const finlList = JSON.parse(strTmp);
+				// console.log(res2['text']);
+				let tempo = [];
+				for (let i = 0; i < finlList.length; i++) {
+					for (let j = 0; j < searchResult.length; j++) {
+						if (searchResult[j].id == finlList[i]) {
+							tempo.push(searchResult[j]);
+							break;
+						}
+					}
+				}
+				openAIList = tempo;
+				openAIresult = true;
+
+				// textquery = '';
+				// recognizedSpeech = '';
+			} else if (image != null) {
+				//text + image
+				const concatanated = textquery;
+			} else {
+				//only text
+
+				const concatanated = textquery;
+				let payload = { text: concatanated };
+				openAIresult = false;
+				const ret = await fetch('/api/summary-search', {
+					method: 'POST',
+					body: JSON.stringify(payload)
+				});
+				const res = await ret.json();
+				console.log(res);
+				searchResult = res['list'];
+				context = '';
+				for (let i = 0; i < searchResult.length; i++) {
+					context += 'id: ';
+					context += searchResult[i].id;
+					context += '. Summary: This is a ';
+					context +=
+						searchResult[i].payload.Category +
+						' from ' +
+						searchResult[i].payload.Company +
+						'. It is a ' +
+						searchResult[i].payload.Name +
+						'. ' +
+						searchResult[i].payload.Description +
+						'. Price' +
+						searchResult[i].payload.Price;
+					context += '\n';
+				}
+				console.log(context);
+				let payload2 = { text: context, query: textquery };
+				// console.log(context)
+				const ret2 = await fetch('/api/sort-embed', {
+					method: 'POST',
+					body: JSON.stringify(payload2)
+				});
+				const res2 = await ret2.json();
+				console.log(res2['text']);
+				let strTmp = '';
+				let ok = false;
+				for (let i = 0; i < res2['text'].length; i++) {
+					if (res2['text'][i] == '[') {
+						ok = true;
+					} else if (res2['text'][i] == ']') {
+						strTmp += res2['text'][i];
+						ok = false;
+						break;
+					}
+					if (ok) {
+						strTmp += res2['text'][i];
+					}
+				}
+				const finlList = JSON.parse(strTmp);
+				// console.log(res2['text']);
+				let tempo = [];
+				for (let i = 0; i < finlList.length; i++) {
+					for (let j = 0; j < searchResult.length; j++) {
+						if (searchResult[j].id == finlList[i]) {
+							tempo.push(searchResult[j]);
+							break;
+						}
+					}
+				}
+				openAIList = tempo;
+				openAIresult = true;
+
+				// textquery = '';
+			}
+		} else if (image != null) {
+			if (recognizedSpeech.length > 0) {
+				//text + image
+				const concatanated = recognizedSpeech;
+			} else {
+				//only image. just roboflow
+				const formData = new FormData();
+
+				formData.append('imageLink', imageUploaded);
+				const ret = await fetch('/api/image-search', {
+					method: 'POST',
+					body: formData
+				});
+				const res = await ret.json();
+				searchResult = res['list'];
+
+				console.log(searchResult);
+
+				context = '';
+				for (let i = 0; i < searchResult.length; i++) {
+					context += 'id: ';
+					context += searchResult[i].id;
+					context += '. Summary: This is a ';
+					context +=
+						searchResult[i].payload.Category +
+						' from ' +
+						searchResult[i].payload.Company +
+						'. It is a ' +
+						searchResult[i].payload.Name +
+						'. ' +
+						searchResult[i].payload.Description +
+						'. Price' +
+						searchResult[i].payload.Price;
+					context += '\n';
+				}
+				console.log(context);
+				let payload2 = { text: context, query: textquery };
+				// console.log(context)
+
+				const ret2 = await fetch('/api/sort-embed', {
+					method: 'POST',
+					body: JSON.stringify(payload2)
+				});
+
+				const res2 = await ret2.json();
+				console.log(res2['text']);
+				let strTmp = '';
+				let ok = false;
+				for (let i = 0; i < res2['text'].length; i++) {
+					if (res2['text'][i] == '[') {
+						ok = true;
+					} else if (res2['text'][i] == ']') {
+						strTmp += res2['text'][i];
+						ok = false;
+						break;
+					}
+					if (ok) {
+						strTmp += res2['text'][i];
+					}
+				}
+				const finlList = JSON.parse(strTmp);
+				// console.log(res2['text']);
+				let tempo = [];
+				for (let i = 0; i < finlList.length; i++) {
+					for (let j = 0; j < searchResult.length; j++) {
+						if (searchResult[j].id == finlList[i]) {
+							tempo.push(searchResult[j]);
+							break;
+						}
+					}
+				}
+				openAIList = tempo;
+				openAIresult = true;
+			}
+		} else if (recognizedSpeech.length > 0) {
+			//text only
+			const concatanated = recognizedSpeech;
+			let payload = { text: concatanated };
+			openAIresult = false;
+			const ret = await fetch('/api/summary-search', {
+				method: 'POST',
+				body: JSON.stringify(payload)
+			});
+			const res = await ret.json();
+			console.log(res);
+			searchResult = res['list'];
+			context = '';
+			for (let i = 0; i < searchResult.length; i++) {
+				context += 'id: ';
+				context += searchResult[i].id;
+				context += '. Summary: This is a ';
+				context +=
+					searchResult[i].payload.Category +
+					' from ' +
+					searchResult[i].payload.Company +
+					'. It is a ' +
+					searchResult[i].payload.Name +
+					'. ' +
+					searchResult[i].payload.Description +
+					'. Price' +
+					searchResult[i].payload.Price;
+				context += '\n';
+			}
+			console.log(context);
+			let payload2 = { text: context, query: textquery };
+			// console.log(context)
+			const ret2 = await fetch('/api/sort-embed', {
+				method: 'POST',
+				body: JSON.stringify(payload2)
+			});
+			const res2 = await ret2.json();
+			console.log(res2['text']);
+			let strTmp = '';
+			let ok = false;
+			for (let i = 0; i < res2['text'].length; i++) {
+				if (res2['text'][i] == '[') {
+					ok = true;
+				} else if (res2['text'][i] == ']') {
+					strTmp += res2['text'][i];
+					ok = false;
 					break;
 				}
+				if (ok) {
+					strTmp += res2['text'][i];
+				}
 			}
+			const finlList = JSON.parse(strTmp);
+			// console.log(res2['text']);
+			let tempo = [];
+			for (let i = 0; i < finlList.length; i++) {
+				for (let j = 0; j < searchResult.length; j++) {
+					if (searchResult[j].id == finlList[i]) {
+						tempo.push(searchResult[j]);
+						break;
+					}
+				}
+			}
+			openAIList = tempo;
+			openAIresult = true;
+
+			// recognizedSpeech = '';
 		}
-		openAIList = tempo;
-		openAIresult = true;
 	}
 
 	async function audioSubmit() {
-		const blob = await new Blob(chunks, { type: 'audio/mp3' });
-		const recordedAudioFile = await new File([blob], 'recorded_audio.mp3', { type: 'audio/mp3' });
-		console.log(recordedAudioFile);
+		// const blob = await new Blob(chunks, { type: 'audio/mp3' });
+		// const recordedAudioFile = await new File([blob], 'recorded_audio.mp3', { type: 'audio/mp3' });
+		// console.log(recordedAudioFile);
 
+		// const recordedAudioFile = new File([audioBlob], 'recorded_audio.webm', { type: 'audio/webm' });
+		// const formData = new FormData();
+		// formData.append('audioFile', recordedAudioFile);
+
+		// const formData = new FormData();
+		// formData.append('audioFile', recordedAudioFile);
+
+		// const ret = await fetch('/api/transcribe', {
+		// 	method: 'POST',
+		// 	body: formData
+		// });
+
+		// const res = await ret.json();
+		// recognizedSpeech = res['text'];
+		// chunks = [];
+
+		// console.log(recognizedSpeech);
+
+		// let payload = { text: recognizedSpeech };
+		// const ret11 = await fetch('/api/summary-search', {
+		// 	method: 'POST',
+		// 	body: JSON.stringify(payload)
+		// });
+		// const res11 = await ret11.json();
+		// searchResult = res11['list'];
+
+		// console.log(searchResult);
+
+		// context = '';
+		// for (let i = 0; i < searchResult.length; i++) {
+		// 	context += 'id: ';
+		// 	context += searchResult[i].id;
+		// 	context += '. Summary: This is a ';
+		// 	context +=
+		// 		searchResult[i].payload.Category +
+		// 		' from ' +
+		// 		searchResult[i].payload.Company +
+		// 		'. It is a ' +
+		// 		searchResult[i].payload.Name +
+		// 		'. ' +
+		// 		searchResult[i].payload.Description +
+		// 		'. Price' +
+		// 		searchResult[i].payload.Price;
+		// 	context += '\n';
+		// }
+		// console.log(context);
+		// let payload2 = { text: context, query: textquery };
+		// // console.log(context)
+
+		// const ret2 = await fetch('/api/sort-embed', {
+		// 	method: 'POST',
+		// 	body: JSON.stringify(payload2)
+		// });
+
+		// const res2 = await ret2.json();
+		// console.log(res2['text']);
+		// let strTmp = '';
+		// let ok = false;
+		// for (let i = 0; i < res2['text'].length; i++) {
+		// 	if (res2['text'][i] == '[') {
+		// 		ok = true;
+		// 	} else if (res2['text'][i] == ']') {
+		// 		strTmp += res2['text'][i];
+		// 		ok = false;
+		// 		break;
+		// 	}
+		// 	if (ok) {
+		// 		strTmp += res2['text'][i];
+		// 	}
+		// }
+		// const finlList = JSON.parse(strTmp);
+		// // console.log(res2['text']);
+		// let tempo = [];
+		// for (let i = 0; i < finlList.length; i++) {
+		// 	for (let j = 0; j < searchResult.length; j++) {
+		// 		if (searchResult[j].id == finlList[i]) {
+		// 			tempo.push(searchResult[j]);
+		// 			break;
+		// 		}
+		// 	}
+		// }
+		// openAIList = tempo;
+		// openAIresult = true;
+		const recordedAudioFile = new File([audioBlob], 'recorded_audio.webm', { type: 'audio/webm' });
 		const formData = new FormData();
 		formData.append('audioFile', recordedAudioFile);
 
-		const ret = await fetch('/api/transcribe', {
+		const response = await fetch('/api/transcribe', {
 			method: 'POST',
 			body: formData
 		});
 
-		const res = await ret.json();
-		recognizedSpeech = res['text'];
-		chunks = [];
-
-		console.log(recognizedSpeech);
-
-		let payload = { text: recognizedSpeech };
-		const ret11 = await fetch('/api/summary-search', {
-			method: 'POST',
-			body: JSON.stringify(payload)
-		});
-		const res11 = await ret11.json();
-		searchResult = res11['list'];
-
-		console.log(searchResult);
-
-		context = '';
-		for (let i = 0; i < searchResult.length; i++) {
-			context += 'id: ';
-			context += searchResult[i].id;
-			context += '. Summary: This is a ';
-			context +=
-				searchResult[i].payload.Category +
-				' from ' +
-				searchResult[i].payload.Company +
-				'. It is a ' +
-				searchResult[i].payload.Name +
-				'. ' +
-				searchResult[i].payload.Description +
-				'. Price' +
-				searchResult[i].payload.Price;
-			context += '\n';
+		if (!response.ok) {
+			console.error('Failed to submit audio');
+			return;
 		}
-		console.log(context);
-		let payload2 = { text: context, query: textquery };
-		// console.log(context)
 
-		const ret2 = await fetch('/api/sort-embed', {
-			method: 'POST',
-			body: JSON.stringify(payload2)
-		});
-
-		const res2 = await ret2.json();
-		console.log(res2['text']);
-		let strTmp = '';
-		let ok = false;
-		for (let i = 0; i < res2['text'].length; i++) {
-			if (res2['text'][i] == '[') {
-				ok = true;
-			} else if (res2['text'][i] == ']') {
-				strTmp += res2['text'][i];
-				ok = false;
-				break;
-			}
-			if (ok) {
-				strTmp += res2['text'][i];
-			}
-		}
-		const finlList = JSON.parse(strTmp);
-		// console.log(res2['text']);
-		let tempo = [];
-		for (let i = 0; i < finlList.length; i++) {
-			for (let j = 0; j < searchResult.length; j++) {
-				if (searchResult[j].id == finlList[i]) {
-					tempo.push(searchResult[j]);
-					break;
-				}
-			}
-		}
-		openAIList = tempo;
-		openAIresult = true;
+		const result = await response.json();
+		recognizedSpeech = result.text;
 	}
 </script>
 
@@ -436,86 +791,166 @@
 	</div>
 </nav>
 
-<div class="p-6 rounded-lg w-full m-4 dark:bg-[#212020]">
-	<div class="flex flex-col justify-center items-center mb-3">
-		<h2 class="text-2xl font-bold font-serif">Input For Query</h2>
+{#if submissionDone}
+	<div class="flex flex-col items-center justify-center mb-6">
+		<h2 class="text-2xl font-bold font-serif">Query Summary</h2>
 	</div>
+	<div class="flex flex-row justify-between">
+		{#if textquery.length > 0}
+			<p class="font-semibold p-3">
+				Text Input: {textquery}
+			</p>
+		{:else}
+			<p class="font-semibold p-3">No text input</p>
+		{/if}
 
-	<div class="flex flex-row space-x-10">
-		<div class="w-1/3">
-			<h1>Textual Query</h1>
-			<form on:submit|preventDefault={textSubmit}>
-				<input
-					class="input input-bordered dark:placeholder:text-[#ffffff9e] w-full max-w-xs"
-					type="text"
-					id="textquery"
-					name="textquery"
-					bind:value={textquery}
-					placeholder="Enter The Query"
-				/>
-				<button
-					type="submit"
-					class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
-				>
-					Submit
-				</button>
-			</form>
-		</div>
-		<div class="w-1/3">
-			<h1>Image </h1>
-			<form on:submit|preventDefault={imageSubmit} enctype="multipart/form-data">
-				<input
-					class="file-input w-full max-w-xs border border-slate-400"
-					type="file"
-					id="image"
-					name="image"
-					bind:value={image}
-				/>
-				<button
-					type="submit"
-					class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
-				>
-					Submit
-				</button>
-			</form>
-		</div>
-		<form on:submit|preventDefault={audioSubmit}>
-			{#if hearingRunning}
-				<button
-					class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
-					disabled={true}
-					on:click={handleHearingStart}
-				>
-					Recording
-				</button>
-			{:else}
-				<button
-					class="bg-green-300 text-base text-black hover:bg-green-500 m-5 gap-1 rounded-md p-2"
-					on:click={handleHearingStart}>Hearing Start</button
-				>
-			{/if}
-			{#if hearingRunning}
-				<button
-					class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
-					on:click={handleHearingStop}>Hearing Stop</button
-				>
-			{:else}
-				<button
-					class="bg-red-500 text-base text-black hover:bg-red-700 m-5 gap-1 rounded-md p-2"
-					disabled
-					on:click={handleHearingStop}>Hearing Stop</button
-				>
-			{/if}
-			<!-- <div class="mt-9 flex flex-col items-center justify-center"></div> -->
-			<button
-				type="submit"
-				class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
-			>
-				Submit
-			</button>
-		</form>
+		{#if imageUploaded.length > 0}
+			<img
+				src={imageUploaded}
+				alt="Start"
+				class="cursor-pointer w-1/2 items-center justify-center"
+			/>
+		{:else}
+			<p class="font-semibold p-3">No Image input</p>
+		{/if}
+
+		{#if recognizedSpeech.length > 0}
+			<p class="font-semibold p-3">
+				Audio Input: {recognizedSpeech}
+			</p>
+		{:else}
+			<p class="font-semibold p-3">No Audio input</p>
+		{/if}
 	</div>
-</div>
+{:else}
+	<div class="p-6 rounded-lg w-full m-4 dark:bg-[#212020]">
+		<div class="flex flex-col justify-center items-center mb-3">
+			<h2 class="text-2xl font-bold font-serif">Input For Query</h2>
+		</div>
+
+		<div class="flex flex-row space-x-10">
+			<div class="w-1/3">
+				<h1>Textual Query</h1>
+				<form on:submit|preventDefault={textSubmit}>
+					<input
+						class="input input-bordered dark:placeholder:text-[#ffffff9e] w-full max-w-xs"
+						type="text"
+						id="textquery"
+						name="textquery"
+						bind:value={textquery}
+						placeholder="Enter The Query"
+					/>
+					<button
+						type="submit"
+						disabled={textDoneSubmitted || textquery.length === 0}
+						class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
+					>
+						Ok
+					</button>
+				</form>
+				{#if textDoneSubmitted}
+					<div class="mt-4 flex flex-col items-center justify-center">
+						<h1 class="text-xl font-semibold ml-6 mr-7">
+							Text Query was: {textquery}
+						</h1>
+					</div>
+				{/if}
+			</div>
+			<div class="w-1/3">
+				<h1>Image</h1>
+				<form on:submit|preventDefault={imageSubmit} enctype="multipart/form-data">
+					<input
+						class="file-input w-full max-w-xs border border-slate-400"
+						type="file"
+						id="image"
+						name="image"
+						disabled={imageUploaded.length > 0}
+						bind:value={image}
+					/>
+					<button
+						type="submit"
+						disabled={imageUploaded.length > 0 || image == null}
+						class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
+					>
+						Ok
+					</button>
+				</form>
+				{#if imageuploading}
+					<div
+						class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+						role="status"
+					>
+						<span
+							class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+							>Loading...</span
+						>
+					</div>
+				{:else if imageUploaded.length > 0}
+					<div class="flex flex-col space-y-3 mt-4">
+						<h1 class="text-lg font-semibold">Your Uploaded Image was</h1>
+						<img
+							src={imageUploaded}
+							alt="Start"
+							class="cursor-pointer w-1/2 items-center justify-center"
+						/>
+					</div>
+				{/if}
+			</div>
+
+			<div class="w-1/3">
+				{#if recognizedSpeech === ''}
+					<div class="flex items-center justify-center space-x-4">
+						{#if $hearingRunning}
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+							<img src={stop} alt="Stop" class="cursor-pointer w-20" on:click={stopRecording} />
+						{:else}
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+							<img src={start} alt="Start" class="cursor-pointer w-20" on:click={startRecording} />
+						{/if}
+						{#if audioURL}
+							<div class="mt-4">
+								<audio controls src={audioURL} class="w-full"></audio>
+							</div>
+						{/if}
+						<button
+							class="btn btn-primary"
+							on:click={audioSubmit}
+							disabled={!audioURL || $hearingRunning}
+						>
+							Ok
+						</button>
+					</div>
+
+					{#if audioURL}
+						<div class="mt-4">
+							<audio controls src={audioURL} class="w-full"></audio>
+						</div>
+					{/if}
+				{:else}
+					<div class="flex items-center justify-center space-x-4">
+						<img src={stopdisabled} alt="Stop-disabled" class="cursor-pointer w-20" />
+						<h1 class="font-semibold text-xl">
+							Your Speech detected was <i>{recognizedSpeech}</i>
+						</h1>
+					</div>
+					<div class="mt-4">
+						<audio controls src={audioURL} class="w-full"></audio>
+					</div>
+				{/if}
+			</div>
+		</div>
+		<div class="flex flex-col items-center justify-center mt-6">
+			<button
+				class="btn text-xl font-semibold dark:text-[#e1e1e1] dark:bg-[#3b6f8e] bg-[#8ad4ff] rounded-xl shadow-md hover:bg-[#619ecf] hover:text-[17px] dark:hover:bg-[#36647e]"
+				on:click={finalSubmit}
+			>
+				Submit query
+			</button>
+		</div>
+	</div>
+{/if}
 
 {#if searchResult.length > 0}
 	{#if openAIresult}
@@ -523,7 +958,7 @@
 	{:else}
 		<h1 class="font-bold ml-10">Showing result fetched from Qdrant. OpenAI analysing..</h1>
 	{/if}
-	<div class="toggle-container ml-10 mt-10">
+	<!-- <div class="toggle-container ml-10 mt-10">
 		<button on:click={() => (showOpenAIResults = !showOpenAIResults)} class="btn">
 			{#if showOpenAIResults}
 				Show Text Results
@@ -531,6 +966,30 @@
 				Show OpenAI Results
 			{/if}
 		</button>
+	</div> -->
+	<div class="flex items-center ml-10 mt-10">
+		<label for="toggleB" class="flex items-center cursor-pointer">
+			<!-- toggle -->
+			<div class="relative">
+				<!-- input -->
+				<input
+					type="checkbox"
+					id="toggleB"
+					class="sr-only"
+					on:click={() => (showOpenAIResults = !showOpenAIResults)}
+				/>
+				<!-- line -->
+				<div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+				<!-- dot -->
+				<div
+					class="dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"
+				></div>
+			</div>
+			<!-- label -->
+			<div class="ml-3 text-gray-700 font-medium">
+				{showOpenAIResults ? 'OpenAI Results' : 'Text Results'}
+			</div>
+		</label>
 	</div>
 	{#if showOpenAIResults}
 		<!-- Display OpenAI Results -->
@@ -617,7 +1076,6 @@
 	{/if}
 {/if}
 
-
 <style>
 	.links {
 		display: flex;
@@ -638,5 +1096,12 @@
 	.links a:hover {
 		color: #007bff; /* Accent color from Skeleton UI */
 	}
-	
+	input:checked ~ .dot {
+		transform: translateX(100%);
+		background-color: #48bb78;
+	}
+
+	.dot {
+		transition: transform 0.3s ease-in-out;
+	}
 </style>
